@@ -9,10 +9,11 @@ http.route({
   path: "/clerk",
   method: "POST",
   handler: httpAction(async (ctx, request) => {
+    
     const payloadString = await request.text();
     const headerPayload = request.headers;
-    const clerk = process.env.NEXT_PUBLIC_CLERK_HOSTNAME
-    console.log("CLERK;",clerk)
+    const clerk = process.env.NEXT_PUBLIC_CLERK_HOSTNAME || "fun-aphid-82.clerk.accounts.dev";
+
     try {
       const result = await ctx.runAction(internal.clerk.fulfill, {
         payload: payloadString,
@@ -22,6 +23,8 @@ http.route({
           "svix-signature": headerPayload.get("svix-signature")!,
         },
       });
+
+      console.log('result: ', result);
 
       switch (result.type) {
         case "user.created":
@@ -43,15 +46,14 @@ http.route({
           });
           break;
         case "organizationMembership.created":
-      
+          console.log("result: ", result);
+          
           await ctx.runMutation(internal.users.addOrgIdToUser, {
             tokenIdentifier: `https://${clerk}|${result.data.public_user_data.user_id}`,
             orgId: result.data.organization.id,
-           
             role: result.data.role === "org:admin" ? "admin" : "member",
-            
           });
-          console.log(result.data.organization.id)
+
           break;
           
         case "organizationMembership.updated":
@@ -68,6 +70,8 @@ http.route({
         status: 200,
       });
     } catch (err) {
+      console.log('err: ', err);
+
       return new Response("Webhook Error", {
         status: 400,
       });

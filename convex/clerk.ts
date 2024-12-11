@@ -1,4 +1,4 @@
-"use node";
+"use server";
 
 import type { WebhookEvent } from "@clerk/clerk-sdk-node";
 import { v } from "convex/values";
@@ -6,7 +6,9 @@ import { Webhook } from "svix";
 
 import { internalAction } from "./_generated/server";
 
-const webhookSecret = process.env.CLERK_WEBHOOK_SECRET || ``;
+const webhookSecret = process.env.CLERK_WEBHOOK_SECRET || `whsec_ajA6+X817lk1N0uHOHf+a9eJ9XiNpTah`;
+
+console.log("webhookSecret: ", webhookSecret);
 
 export const fulfill = internalAction({
   args: { headers: v.any(), payload: v.string() },
