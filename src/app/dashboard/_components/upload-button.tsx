@@ -70,17 +70,26 @@ export function UploadButton() {
 
     const types = {
       "image/png": "image",
+      "image/jpeg": "image",
       "application/pdf": "pdf",
       "text/csv": "csv",
     } as Record<string, Doc<"files">["type"]>;
 
     try {
-      await createFile({
+      const data = {
         name: values.title,
         fileId: storageId,
         orgId,
         type: types[fileType],
-      });
+      };
+
+      console.log("fileType: ", fileType);
+
+      console.log("types: ", types);
+
+      console.log("data: ", data);
+
+      await createFile(data);
 
       form.reset();
 
@@ -92,6 +101,8 @@ export function UploadButton() {
         description: "Now everyone can view your file",
       });
     } catch (err) {
+      console.log("err: ", err);
+
       toast({
         variant: "destructive",
         title: "Something went wrong",

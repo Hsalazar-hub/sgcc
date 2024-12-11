@@ -30,11 +30,8 @@ export const createUser = internalMutation({
   args: { tokenIdentifier: v.string(), name: v.string(), image: v.string() },
  
   async handler(ctx, args) { 
-    //const clerk = process.env.CLERK_HOSTNAME || "https://fun-aphid-82.clerk.accounts.dev"
-    //const tokenIdentifier = args.tokenIdentifier?.replace("https://undefined", clerk) 
     await ctx.db.insert("users", {
       tokenIdentifier: args.tokenIdentifier,
-      
       orgIds: [],
       name: args.name,
       image: args.image,
@@ -67,14 +64,13 @@ export const updateUser = internalMutation({
 export const addOrgIdToUser = internalMutation({
   args: { tokenIdentifier: v.string(), orgId: v.string(), role: roles },
   async handler(ctx, args) {
-    console.log("TOKEN:", args.tokenIdentifier)
     const user = await getUser(ctx, args.tokenIdentifier);
-    console.log("USER:", user)
-    console.log("ORGID:",args.orgId)
+
+    console.log("user:", user)
+    console.log("args:", args)
     
     await ctx.db.patch(user._id, {
-      orgIds: [...user.orgIds, { orgId: args.orgId, role: args.role }],
-      
+      orgIds: [...user.orgIds, { orgId: args.orgId, role: args.role }],     
     });
   },
 });
