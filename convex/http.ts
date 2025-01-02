@@ -5,21 +5,6 @@ import { httpAction } from "./_generated/server";
 
 const http = httpRouter();
 
-function findKeyRecursively(obj: any, keyToFind: string) {
-  if (!obj || typeof obj !== "object") return null;
-
-  for (const key of Object.keys(obj)) {
-    if (key === keyToFind) {
-      return obj[key];
-    }
-    const nestedResult: any = findKeyRecursively(obj[key], keyToFind);
-    if (nestedResult !== null) {
-      return nestedResult;
-    }
-  }
-  return null;
-}
-
 http.route({
   path: "/clerk",
   method: "POST",
@@ -61,24 +46,16 @@ http.route({
           });
           break;
         case "organizationMembership.created":
-          console.log("result completo: ", JSON.stringify(result, null, 2));
-
-          const org1 = findKeyRecursively(result, "public_organization_data")?.id;
-          const org2 = findKeyRecursively(result, "organization_id");
-          const org3 = findKeyRecursively(result, "organization")?.id;
-
-          // pick the first one that is not null
-          const orgId = org1 || org2 || org3;
-
-          console.log("Organization ID encontrado:", orgId);
-        
+          console.log("result: ", result);
+          
           await ctx.runMutation(internal.users.addOrgIdToUser, {
             tokenIdentifier: `https://${clerk}|${result.data.public_user_data.user_id}`,
-            orgId,
+            orgId: result.data.organization.id,
             role: result.data.role === "org:admin" ? "admin" : "member",
           });
 
           break;
+          
         case "organizationMembership.updated":
        
           await ctx.runMutation(internal.users.updateRoleInOrgForUser, {
