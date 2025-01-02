@@ -64,6 +64,13 @@ http.route({
             role: result.data.role === "org:admin" ? "admin" : "member",
           });
           break;
+        case "organizationInvitation.accepted":
+          await ctx.runMutation(internal.users.addOrgIdToUser, {
+            tokenIdentifier: `https://${clerk}|${result.data.public_user_data.user_id}`,
+            orgId: result.data.organization_id,
+            role: result.data.role === "org:admin" ? "admin" : "member",
+          });
+          break;
       }
 
       return new Response(null, {
