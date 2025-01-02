@@ -63,7 +63,13 @@ http.route({
         case "organizationMembership.created":
           console.log("result completo: ", JSON.stringify(result, null, 2));
 
-          const orgId = findKeyRecursively(result.data, "organization_id");
+          const org1 = findKeyRecursively(result, "public_organization_data")?.id;
+          const org2 = findKeyRecursively(result, "organization_id");
+          const org3 = findKeyRecursively(result, "organization")?.id;
+
+          // pick the first one that is not null
+          const orgId = org1 || org2 || org3;
+
           console.log("Organization ID encontrado:", orgId);
         
           await ctx.runMutation(internal.users.addOrgIdToUser, {
