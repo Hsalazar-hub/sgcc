@@ -11,7 +11,7 @@ import { fileTypes } from "./schema";
 import { Doc, Id } from "./_generated/dataModel";
 import { Clerk } from "@clerk/clerk-sdk-node";
 
-const clerkClient = Clerk({ apiKey: "sk_test_68lCyPpiXvmrP0GppR42yI8abIcwrxqXCMiBrFpNGz" });
+const clerkClient = Clerk({ secretKey: "sk_test_68lCyPpiXvmrP0GppR42yI8abIcwrxqXCMiBrFpNGz" });
 
 export const generateUploadUrl = mutation(async (ctx) => {
   const identity = await ctx.auth.getUserIdentity();
