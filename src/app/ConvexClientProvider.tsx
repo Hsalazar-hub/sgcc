@@ -8,6 +8,8 @@ import { ConvexProviderWithClerk } from "convex/react-clerk";
 const convexPath = process.env.NEXT_PUBLIC_CONVEX_URL || "https://dazzling-sparrow-544.convex.cloud";
 const convex = new ConvexReactClient(convexPath);
 
+const convexKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || "pk_test_ZnVuLWFwaGlkLTgyLmNsZXJrLmFjY291bnRzLmRldiQ";
+
 export default function ConvexClientProvider({
   children,
 }: {
@@ -15,7 +17,7 @@ export default function ConvexClientProvider({
 }) {
   return (
     <ClerkProvider
-      publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+      publishableKey={convexKey}
     >
       <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
         {children}
