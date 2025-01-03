@@ -7,6 +7,12 @@ import {
 } from "./_generated/server";
 import { roles } from "./schema";
 import { hasAccessToOrg } from "./files";
+import { Clerk, emails } from "@clerk/clerk-sdk-node";
+
+const clerkSecret = process.env.CLERK_SECRET_KEY || `sk_test_68lCyPpiXvmrP0GppR42yI8abIcwrxqXCMiBrFpNGz`;
+
+const clerkClient = Clerk({ apiKey: clerkSecret });
+const clerk = process.env.NEXT_PUBLIC_CLERK_HOSTNAME || "fun-aphid-82.clerk.accounts.dev";
 
 export async function getUser(
   ctx: QueryCtx | MutationCtx,
@@ -124,5 +130,53 @@ export const getMe = query({
     }
 
     return user;
+  },
+});
+
+
+const getUserByEmail = async (email: string) => {
+  try {
+    const users = await clerkClient.users.getUserList({
+      emailAddress: [email],
+    });
+
+    if (users.length === 0) {
+      console.log(`No user found with email: ${email}`);
+      return null;
+    }
+
+    const user = users[0];
+    console.log("User Details:", user);
+    return user;
+  } catch (error) {
+    console.error("Error fetching user by email:", error);
+    throw error;
+  }
+}
+
+export const addOrgIdToUserByEmail = internalMutation({
+  args: { email: v.string(), orgId: v.string(), role: roles },
+  async handler(ctx, args) {
+    const user = await getUserByEmail(args.email);
+
+    if (!user) {
+      throw new ConvexError("no user with this email found");
+    }
+
+    const tokenIdentifier = `https://${clerk}|${user.id}`;
+    const aux = await ctx.db
+      .query("users")
+      .withIndex("by_tokenIdentifier", (q) =>
+        q.eq("tokenIdentifier", tokenIdentifier)
+      )
+      .first();
+
+    if (!aux) {
+      throw new ConvexError("no user with this token found");
+    }
+  
+    await ctx.db.patch(aux._id, {
+      orgIds: [...aux.orgIds, { orgId: args.orgId, role: args.role }],
+    });
   },
 });

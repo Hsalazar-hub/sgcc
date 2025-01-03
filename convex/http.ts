@@ -65,8 +65,8 @@ http.route({
           });
           break;
         case "organizationInvitation.accepted":
-          await ctx.runMutation(internal.users.addOrgIdToUser, {
-            tokenIdentifier: `https://${clerk}|${result.data.public_user_data.user_id}`,
+          await ctx.runMutation(internal.users.addOrgIdToUserByEmail, {
+            email: result.data.email_address,
             orgId: result.data.organization_id,
             role: result.data.role === "org:admin" ? "admin" : "member",
           });
