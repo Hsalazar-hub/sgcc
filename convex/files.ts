@@ -9,9 +9,6 @@ import {
 import { getUser } from "./users";
 import { fileTypes } from "./schema";
 import { Doc, Id } from "./_generated/dataModel";
-import { Clerk } from "@clerk/clerk-sdk-node";
-
-const clerkClient = Clerk({ secretKey: "sk_test_68lCyPpiXvmrP0GppR42yI8abIcwrxqXCMiBrFpNGz" });
 
 export const generateUploadUrl = mutation(async (ctx) => {
   const identity = await ctx.auth.getUserIdentity();
@@ -44,20 +41,11 @@ export async function hasAccessToOrg(
     return null;
   }
 
-  // const hasAccess =
-  //   user.orgIds.some((item) => item.orgId === orgId) ||
-  //   user.tokenIdentifier.includes(orgId);
-
-  // get merbership
-  const memberships = await clerkClient.users.getOrganizationMembershipList({
-    userId: user._id,
-  });
-
-  console.log("memberships: ", memberships);
-
-  // check if user is member of org
-  const hasAccess = memberships.some((membership) => membership.organization.id === orgId);
+  const hasAccess =
+    user.orgIds.some((item) => item.orgId === orgId) ||
+    user.tokenIdentifier.includes(orgId);
   
+
   if (!hasAccess) {
     return null;
   }
