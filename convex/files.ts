@@ -9,7 +9,7 @@ import {
 import { getUser } from "./users";
 import { fileTypes } from "./schema";
 import { Doc, Id } from "./_generated/dataModel";
-
+import { subDays } from 'date-fns';
 export const generateUploadUrl = mutation(async (ctx) => {
   const identity = await ctx.auth.getUserIdentity();
 
@@ -59,6 +59,8 @@ export const createFile = mutation({
     fileId: v.id("_storage"),
     orgId: v.string(),
     type: fileTypes,
+    expdate: v.float64(),
+    monto: v.float64(),
   },
   
   async handler(ctx, args) {
@@ -72,8 +74,10 @@ export const createFile = mutation({
     await ctx.db.insert("files", {
       name: args.name,
       orgId: args.orgId,
+      monto: args.monto,
       fileId: args.fileId,
       type: args.type,
+      expdate: args.expdate,
       userId: hasAccess.user._id,
       
     });
@@ -158,6 +162,44 @@ export const deleteAllFiles = internalMutation({
     );
   },
 });
+
+
+export const notifyExpiredFiles = internalMutation({
+  args: {},
+  async handler(ctx) {
+    const now = new Date();
+    const fiveDaysBefore = subDays(now, 5); 
+    // Obtener archivos con expDate pasada
+    const expiredFiles = await ctx.db
+      .query("files")
+      .withIndex("by_expdate", (q) => q
+      .gte("expdate", fiveDaysBefore.getTime())  // ExpDate debe ser mayor o igual a la fecha de hace 5 días
+      .lt("expdate", now.getTime())             // ExpDate debe ser menor que la fecha actual
+    )
+      .collect();
+
+    if (expiredFiles.length === 0) return;
+
+    // Procesar en lotes para evitar sobrecarga
+    const batchSize = 50; // Puedes ajustar el tamaño del lote según necesidad
+    for (let i = 0; i < expiredFiles.length; i += batchSize) {
+      const batch = expiredFiles.slice(i, i + batchSize);
+      
+      await Promise.all(
+        batch.map(async (file) => {
+          // await ctx.db.insert("notifications", {
+          //   userId: file.userId,
+          //   message: `Tu póliza "${file.name}" va a expirar.`,
+          //   fileId: file._id,
+          //   createdAt: now,
+          // });
+        })
+      );
+    }
+  },
+);
+
+
 
 function assertCanDeleteFile(user: Doc<"users">, file: Doc<"files">) {
   const canDelete =
@@ -272,3 +314,5 @@ async function hasAccessToFile(
 
   return { user: hasAccess.user, file };
 }
+
+

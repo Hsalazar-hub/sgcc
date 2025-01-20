@@ -49,7 +49,7 @@ export function SearchBar({
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <Input {...field} placeholder="your file names" />
+                  <Input {...field} placeholder="Sus Pólizas" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -65,7 +65,7 @@ export function SearchBar({
             {form.formState.isSubmitting && (
               <Loader2 className="h-4 w-4 animate-spin" />
             )}
-            <SearchIcon /> Search
+            <SearchIcon /> Buscar
           </Button>
         </form>
       </Form>

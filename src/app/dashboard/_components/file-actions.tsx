@@ -50,14 +50,13 @@ export function FileCardActions({
       <AlertDialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogTitle>Esta seguro?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action will mark the file for our deletion process. Files are
-              deleted periodically
+              Esta opción marcará la póliza y la colocará en la lista de borrado.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
               onClick={async () => {
                 await deleteFile({
@@ -88,7 +87,7 @@ export function FileCardActions({
             }}
             className="flex gap-1 items-center cursor-pointer"
           >
-            <FileIcon className="w-4 h-4" /> Download
+            <FileIcon className="w-4 h-4" /> Visualizar
           </DropdownMenuItem>
 
           <DropdownMenuItem
@@ -101,11 +100,11 @@ export function FileCardActions({
           >
             {isFavorited ? (
               <div className="flex gap-1 items-center">
-                <StarIcon className="w-4 h-4" /> Unfavorite
+                <StarIcon className="w-4 h-4" /> No importante
               </div>
             ) : (
               <div className="flex gap-1 items-center">
-                <StarHalf className="w-4 h-4" /> Favorite
+                <StarHalf className="w-4 h-4" /> Importante
               </div>
             )}
           </DropdownMenuItem>
@@ -135,11 +134,11 @@ export function FileCardActions({
             >
               {file.shouldDelete ? (
                 <div className="flex gap-1 text-green-600 items-center cursor-pointer">
-                  <UndoIcon className="w-4 h-4" /> Restore
+                  <UndoIcon className="w-4 h-4" /> Restaurar
                 </div>
               ) : (
                 <div className="flex gap-1 text-red-600 items-center cursor-pointer">
-                  <TrashIcon className="w-4 h-4" /> Delete
+                  <TrashIcon className="w-4 h-4" /> Borrar
                 </div>
               )}
             </DropdownMenuItem>
