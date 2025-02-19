@@ -7,6 +7,20 @@ export const fileTypes = v.union(
   v.literal("pdf")
 );
 
+export const ptypes = v.optional(v.union(
+  v.literal("HCM"),
+  v.literal("Vehiculo"),
+  v.literal("RCV de vehículos"),
+  v.literal("RCV de embarcacion"),
+  v.literal("RCV de aviación"),
+  v.literal("Incendios"),
+  v.literal("Combinado Residencial"),
+  v.literal("Accidentes personales"),
+  v.literal("Poliza de vida"),
+  v.literal("Poliza Empresarial"),
+
+))
+
 export const roles = v.union(v.literal("admin"), v.literal("member"));
 
 export default defineSchema({
@@ -17,6 +31,7 @@ export default defineSchema({
     orgId: v.string(),
     fileId: v.id("_storage"),
     userId: v.id("users"),
+    ptype: ptypes,
     shouldDelete: v.optional(v.boolean()),
     expdate: v.optional(v.float64())
   })

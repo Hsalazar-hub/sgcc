@@ -1,6 +1,13 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useOrganization, useUser } from "@clerk/nextjs";
 import {
   Form,
@@ -31,6 +38,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
 import { Doc } from "../../../../convex/_generated/dataModel";
 
+
 const formSchema = z.object({
   title: z.string().min(1).max(200),
   
@@ -39,6 +47,7 @@ const formSchema = z.object({
     .refine((files) => files.length > 0, `Required`),
   monto: z.number(),
   expdate: z.date(),
+  ptype: z.string(),
 });
 
 export function UploadButton() {
@@ -55,6 +64,7 @@ export function UploadButton() {
       file: undefined,
       monto:0,
       expdate: new Date(),
+      ptype: undefined,
     },
   });
 
@@ -67,7 +77,9 @@ export function UploadButton() {
     const postUrl = await generateUploadUrl();
 
     const fileType = values.file[0].type;
+    
     data.expdate = new Date(data.expdate).getTime()
+  
     const result = await fetch(postUrl, {
       method: "POST",
       headers: { "Content-Type": fileType },
@@ -82,6 +94,8 @@ export function UploadButton() {
       "text/csv": "csv",
     } as Record<string, Doc<"files">["type"]>;
 
+
+
     try {
       const newfile = {
         name: data.title,
@@ -90,6 +104,7 @@ export function UploadButton() {
         orgId,
         monto: +data.monto,
         type: types[fileType],
+        ptype: data.ptype,
       };
 
       console.log("fileType: ", fileType);
@@ -161,6 +176,38 @@ export function UploadButton() {
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+               <FormField
+                control={form.control}
+                name="ptype"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tipo de póliza</FormLabel>
+                    <Select
+                        
+                        onValueChange={field.onChange} defaultValue={field.value}
+                      >
+                    <FormControl>
+                      <SelectTrigger id="type-select">
+                       <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                        <SelectItem value="HCM">HCM</SelectItem>
+                        <SelectItem value="Vehiculo">Vehiculo</SelectItem>
+                        <SelectItem value="RCV de vehículos">RCV de vehículos</SelectItem>
+                        <SelectItem value="RCV de embarcacion">RCV de embarcacion</SelectItem>
+                        <SelectItem value="RCV de aviación">RCV de aviación</SelectItem>
+                        <SelectItem value="Incendios">Incendios</SelectItem>
+                        <SelectItem value="Combinado Residencial">Combinado Residencial</SelectItem>
+                        <SelectItem value="Accidentes personales">Accidentes personales</SelectItem>
+                        <SelectItem value="Poliza de vida">Poliza de vida</SelectItem>
+                        <SelectItem value="Poliza Empresarial">Poliza Empresarial</SelectItem>
+                      </SelectContent>
+                      </Select >
                     <FormMessage />
                   </FormItem>
                 )}

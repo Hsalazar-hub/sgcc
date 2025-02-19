@@ -8,8 +8,14 @@ import {
 } from "./_generated/server";
 import { getUser } from "./users";
 import { fileTypes } from "./schema";
+import { ptypes } from "./schema";
 import { Doc, Id } from "./_generated/dataModel";
 import { subDays } from 'date-fns';
+import {Resend} from "resend";
+
+
+export const resend = new Resend("re_Xeq6c2mE_14iuFx8Tt4NqnEHZDKj75XCX")
+
 export const generateUploadUrl = mutation(async (ctx) => {
   const identity = await ctx.auth.getUserIdentity();
 
@@ -44,7 +50,7 @@ export async function hasAccessToOrg(
   const hasAccess =
     user.orgIds.some((item) => item.orgId === orgId) ||
     user.tokenIdentifier.includes(orgId);
-  
+
 
   if (!hasAccess) {
     return null;
@@ -59,14 +65,15 @@ export const createFile = mutation({
     fileId: v.id("_storage"),
     orgId: v.string(),
     type: fileTypes,
+    ptype: ptypes,
     expdate: v.float64(),
     monto: v.float64(),
   },
-  
+
   async handler(ctx, args) {
-    
+
     const hasAccess = await hasAccessToOrg(ctx, args.orgId);
-   
+
     if (!hasAccess) {
       throw new ConvexError("you do not have access to this org");
     }
@@ -79,7 +86,7 @@ export const createFile = mutation({
       type: args.type,
       expdate: args.expdate,
       userId: hasAccess.user._id,
-      
+      ptype: args.ptype,
     });
   },
 });
@@ -91,6 +98,7 @@ export const getFiles = query({
     favorites: v.optional(v.boolean()),
     deletedOnly: v.optional(v.boolean()),
     type: v.optional(fileTypes),
+    ptype: v.optional(ptypes),
   },
   async handler(ctx, args) {
     const hasAccess = await hasAccessToOrg(ctx, args.orgId);
@@ -134,6 +142,9 @@ export const getFiles = query({
     if (args.type) {
       files = files.filter((file) => file.type === args.type);
     }
+    if (args.ptype) {
+      files = files.filter((file) => file.ptype === args.ptype);
+    }
 
     const filesWithUrl = await Promise.all(
       files.map(async (file) => ({
@@ -168,38 +179,57 @@ export const notifyExpiredFiles = internalMutation({
   args: {},
   async handler(ctx) {
     const now = new Date();
-    const fiveDaysBefore = subDays(now, 5); 
-    // Obtener archivos con expDate pasada
+    const fiveDaysBefore = subDays(now, 5);
+
+    // Obtener archivos expirados en los últimos 5 días
     const expiredFiles = await ctx.db
       .query("files")
-      .withIndex("by_expdate", (q) => q
-      .gte("expdate", fiveDaysBefore.getTime())  // ExpDate debe ser mayor o igual a la fecha de hace 5 días
-      .lt("expdate", now.getTime())             // ExpDate debe ser menor que la fecha actual
-    )
+      .withIndex("by_expdate", (q) =>
+        q.gte("expdate", fiveDaysBefore.getTime()) //.lt("expdate", now.getTime())
+      )
       .collect();
-
+      console.log(expiredFiles.length)
     if (expiredFiles.length === 0) return;
 
-    // Procesar en lotes para evitar sobrecarga
-    const batchSize = 50; // Puedes ajustar el tamaño del lote según necesidad
+    // Procesar correos en lotes (máx. 50 por iteración)
+    const batchSize = 50;
     for (let i = 0; i < expiredFiles.length; i += batchSize) {
       const batch = expiredFiles.slice(i, i + batchSize);
-      
-      await Promise.all(
-        batch.map(async (file) => {
-          // await ctx.db.insert("notifications", {
-          //   userId: file.userId,
-          //   message: `Tu póliza "${file.name}" va a expirar.`,
-          //   fileId: file._id,
-          //   createdAt: now,
-          // });
-        })
-      );
+
+      for (const file of batch) {
+        try {
+          fetch("https://api.resend.dev/v1/emails/send", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              to: "hdsalazar20@gmail.com",
+              from: "Acme <onboarding@resend.dev>",
+              subject: "Tu póliza está a punto de expirar",
+              html: `<p>Su póliza <strong>${file.name}</strong> está a punto de expirar, por favor esté atento!</p>`,
+            }),
+          }).then((res) => {
+            if (!res.ok) {
+              throw new Error("Error al enviar correo");
+            }
+          });
+
+          // const {data, error} = await resend.emails.send({
+          //   to: "hdsalazar20@gmail.com", 
+          //   from: "Acme <onboarding@resend.dev>",
+          //   subject: "Tu póliza está a punto de expirar",
+          //  // react: undefined,
+          //  html: `<p>Su póliza <strong>${file.name}</strong> está a punto de expirar, por favor esté atento!</p>`,
+          //  }) 
+          //  console.log(error)
+        } catch (error) {
+          console.error("Error al enviar correo:", error);
+        }
+      }
     }
   },
-);
-
-
+});
 
 function assertCanDeleteFile(user: Doc<"users">, file: Doc<"files">) {
   const canDelete =

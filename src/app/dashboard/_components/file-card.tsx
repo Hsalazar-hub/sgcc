@@ -72,6 +72,9 @@ export function FileCard({
         <div>Sin fecha de expiración</div>
       )}
   </div>
+  <div className="text-xs text-gray-700">
+    Tipo de póliza: {file.ptype}
+  </div>
 </CardFooter>
     </Card>
   );

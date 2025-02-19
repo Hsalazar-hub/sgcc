@@ -30,7 +30,7 @@ function Placeholder() {
         height="300"
         src="/empty.svg"
       />
-      <div className="text-2xl">You have no files, upload one now</div>
+      <div className="text-2xl">No posee ninguna póliza en esta seccion.</div>
       <UploadButton />
     </div>
   );
@@ -51,6 +51,7 @@ export function FileBrowser({
   const user = useUser();
   const [query, setQuery] = useState("");
   const [type, setType] = useState<Doc<"files">["type"] | "all">("all");
+  const [ptype, setpType] = useState<Doc<"files">["ptype"] | "all">("all");
 
   let orgId: string | undefined = undefined;
   if (organization.isLoaded && user.isLoaded) {
@@ -70,6 +71,7 @@ export function FileBrowser({
           type: type === "all" ? undefined : type,
           query,
           favorites: favoritesOnly,
+          ptype: ptype === "all" ? undefined : ptype,
           deletedOnly,
         }
       : "skip"
@@ -107,11 +109,11 @@ export function FileBrowser({
           </TabsList>
 
           <div className="flex gap-2 items-center">
-            <Label htmlFor="type-select">Type Filter</Label>
+            <Label htmlFor="type-select">Filtrado por tipo</Label>
             <Select
-              value={type}
+              value={ptype}
               onValueChange={(newType) => {
-                setType(newType as any);
+                setpType(newType as any);
               }}
             >
               <SelectTrigger id="type-select" className="w-[180px]">
@@ -119,9 +121,16 @@ export function FileBrowser({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All</SelectItem>
-                <SelectItem value="image">Image</SelectItem>
-                <SelectItem value="csv">CSV</SelectItem>
-                <SelectItem value="pdf">PDF</SelectItem>
+                <SelectItem value="HCM">HCM</SelectItem>
+                <SelectItem value="Vehiculo">Vehiculo</SelectItem>
+                <SelectItem value="RCV de vehículos">RCV de vehículos</SelectItem>
+                <SelectItem value="RCV de embarcacion">RCV de embarcacion</SelectItem>
+                <SelectItem value="RCV de aviación">RCV de aviación</SelectItem>
+                <SelectItem value="Incendios">Incendios</SelectItem>
+                <SelectItem value="Combinado Residencial">Combinado Residencial</SelectItem>
+                <SelectItem value="Accidentes personales">Accidentes personales</SelectItem>
+                <SelectItem value="Poliza de vida">Poliza de vida</SelectItem>
+                <SelectItem value="Poliza Empresarial">Poliza Empresarial</SelectItem>
               </SelectContent>
             </Select>
           </div>
