@@ -22,7 +22,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import { z } from "zod";
+import { date, number, z, ZodNumber } from "zod";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -33,14 +33,18 @@ import { Doc } from "../../../../convex/_generated/dataModel";
 
 const formSchema = z.object({
   title: z.string().min(1).max(200),
+  
   file: z
     .custom<FileList>((val) => val instanceof FileList, "Required")
     .refine((files) => files.length > 0, `Required`),
+  monto: z.number(),
+  expdate: z.date(),
 });
 
 export function UploadButton() {
   const { toast } = useToast();
   const organization = useOrganization();
+ 
   const user = useUser();
   const generateUploadUrl = useMutation(api.files.generateUploadUrl);
 
@@ -49,22 +53,25 @@ export function UploadButton() {
     defaultValues: {
       title: "",
       file: undefined,
+      monto:0,
+      expdate: new Date(),
     },
   });
 
   const fileRef = form.register("file");
-
+  
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (!orgId) return;
 
+    const data: any = values;
     const postUrl = await generateUploadUrl();
 
     const fileType = values.file[0].type;
-
+    data.expdate = new Date(data.expdate).getTime()
     const result = await fetch(postUrl, {
       method: "POST",
       headers: { "Content-Type": fileType },
-      body: values.file[0],
+      body: data.file[0],
     });
     const { storageId } = await result.json();
 
@@ -76,10 +83,12 @@ export function UploadButton() {
     } as Record<string, Doc<"files">["type"]>;
 
     try {
-      const data = {
-        name: values.title,
+      const newfile = {
+        name: data.title,
         fileId: storageId,
+        expdate: data.expdate,
         orgId,
+        monto: +data.monto,
         type: types[fileType],
       };
 
@@ -88,8 +97,9 @@ export function UploadButton() {
       console.log("types: ", types);
 
       console.log("data: ", data);
+      console.log("data: ", newfile);
 
-      await createFile(data);
+      await createFile(newfile);
 
       form.reset();
 
@@ -97,16 +107,16 @@ export function UploadButton() {
 
       toast({
         variant: "success",
-        title: "File Uploaded",
-        description: "Now everyone can view your file",
+        title: "Póliza añadida con éxito",
+        description: "Póliza añadida con éxito",
       });
     } catch (err) {
       console.log("err: ", err);
 
       toast({
         variant: "destructive",
-        title: "Something went wrong",
-        description: "Your file could not be uploaded, try again later",
+        title: "Hubo un problema",
+        description: "Su póliza no pudo ser añadida, intente mas tarde",
       });
     }
   }
@@ -129,13 +139,13 @@ export function UploadButton() {
       }}
     >
       <DialogTrigger asChild>
-        <Button>Upload File</Button>
+        <Button>Añadir Póliza</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="mb-8">Upload your File Here</DialogTitle>
+          <DialogTitle className="mb-8">Añada su póliza</DialogTitle>
           <DialogDescription>
-            This file will be accessible by anyone in your organization
+            
           </DialogDescription>
         </DialogHeader>
 
@@ -147,7 +157,7 @@ export function UploadButton() {
                 name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Title</FormLabel>
+                    <FormLabel>Título</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -155,13 +165,50 @@ export function UploadButton() {
                   </FormItem>
                 )}
               />
-
+              <FormField
+                control={form.control}
+                name="monto"
+                render={({field} ) => (
+                  <FormItem>
+                    <FormLabel>Monto</FormLabel>
+                    <FormControl>
+                    <Input
+                        id="monto"
+                        type="number"
+                        {...field}
+                        value={field.value || ''}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+                     <FormField
+                control={form.control}
+                name="expdate"
+                render={({field} ) => (
+                  <FormItem>
+                    <FormLabel>Fecha de expiración</FormLabel>
+                    <FormControl>
+                    <Input
+                        id="expdate"
+                        type="date"
+                        {...field}
+                        value={field.value ? new Date(field.value).toISOString().split('T')[0] : ''} 
+                        onChange={(e) => field.onChange(new Date(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="file"
                 render={() => (
                   <FormItem>
-                    <FormLabel>File</FormLabel>
+                    <FormLabel>Archivo</FormLabel>
                     <FormControl>
                       <Input type="file" {...fileRef} />
                     </FormControl>
@@ -177,7 +224,7 @@ export function UploadButton() {
                 {form.formState.isSubmitting && (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 )}
-                Submit
+                Añadir
               </Button>
             </form>
           </Form>

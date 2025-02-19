@@ -45,7 +45,9 @@ export function FileBrowser({
   favoritesOnly?: boolean;
   deletedOnly?: boolean;
 }) {
-  const organization = useOrganization();
+  const organization  = useOrganization();
+ 
+
   const user = useUser();
   const [query, setQuery] = useState("");
   const [type, setType] = useState<Doc<"files">["type"] | "all">("all");
@@ -128,7 +130,7 @@ export function FileBrowser({
         {isLoading && (
           <div className="flex flex-col gap-8 w-full items-center mt-24">
             <Loader2 className="h-32 w-32 animate-spin text-gray-500" />
-            <div className="text-2xl">Loading your files...</div>
+            <div className="text-2xl">Cargando sus pólizas...</div>
           </div>
         )}
 
