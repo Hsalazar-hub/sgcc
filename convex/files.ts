@@ -1,4 +1,6 @@
 import { ConvexError, v } from "convex/values";
+import { useMutation } from "convex/react";
+import { api } from "./_generated/api";
 import {
   MutationCtx,
   QueryCtx,
@@ -14,11 +16,11 @@ import { subDays } from 'date-fns';
 import {Resend} from "resend";
 
 
-export const resend = new Resend("re_Xeq6c2mE_14iuFx8Tt4NqnEHZDKj75XCX")
+
 
 export const generateUploadUrl = mutation(async (ctx) => {
   const identity = await ctx.auth.getUserIdentity();
-
+  
   if (!identity) {
     throw new ConvexError("you must be logged in to upload a file");
   }
@@ -178,6 +180,7 @@ export const deleteAllFiles = internalMutation({
 export const notifyExpiredFiles = internalMutation({
   args: {},
   async handler(ctx) {
+    
     const now = new Date();
     const fiveDaysBefore = subDays(now, 5);
 
@@ -198,22 +201,18 @@ export const notifyExpiredFiles = internalMutation({
 
       for (const file of batch) {
         try {
-          fetch("https://api.resend.dev/v1/emails/send", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              to: "hdsalazar20@gmail.com",
-              from: "Acme <onboarding@resend.dev>",
-              subject: "Tu póliza está a punto de expirar",
-              html: `<p>Su póliza <strong>${file.name}</strong> está a punto de expirar, por favor esté atento!</p>`,
-            }),
-          }).then((res) => {
-            if (!res.ok) {
-              throw new Error("Error al enviar correo");
-            }
+          const result =  await ctx.runMutation(api.email.sendEmail, {
+            to: "hdsalazar20@gmail.com",
+            subject: "Correo de prueba",
+            body: "Este es un correo de prueba enviado con Resend y Convex.",
           });
+     
+        
+          if (result.success) {
+            console.log("Correo enviado con éxito:", result.response);
+          } else {
+            console.error("Error al enviar el correo:", result.error);
+          }
 
           // const {data, error} = await resend.emails.send({
           //   to: "hdsalazar20@gmail.com", 

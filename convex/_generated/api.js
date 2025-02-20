@@ -20,29 +20,3 @@ import { anyApi } from "convex/server";
  */
 export const api = anyApi;
 export const internal = anyApi;
-
-
-export const sendEmail = internalAction({
-  args: {
-    to: "string",
-    subject: "string",
-    body: "string",
-  },
-  handler: async ({ args }) => {
-    try {
-      const { to, subject, body } = args;
-
-      const response = await resend.emails.send({
-        from: "Acme <onboarding@resend.dev>",
-        to,
-        subject,
-        html: `<p>${body}</p>`,
-      });
-
-      return { success: true, response };
-    } catch (error) {
-      console.error("Error sending email:", error);
-      return { success: false, error: error.message };
-    }
-  },
-});
