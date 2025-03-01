@@ -28,20 +28,20 @@ export const columns: ColumnDef<
 >[] = [
   {
     accessorKey: "name",
-    header: "Name",
+    header: "Nombre",
   },
   {
     accessorKey: "type",
-    header: "Type",
+    header: "Tipo",
   },
   {
-    header: "User",
+    header: "Usuario",
     cell: ({ row }) => {
       return <UserCell userId={row.original.userId} />;
     },
   },
   {
-    header: "Uploaded On",
+    header: "Súbida el",
     cell: ({ row }) => {
       return (
         <div>
@@ -51,7 +51,7 @@ export const columns: ColumnDef<
     },
   },
   {
-    header: "Actions",
+    header: "Acciones",
     cell: ({ row }) => {
       return (
         <div>

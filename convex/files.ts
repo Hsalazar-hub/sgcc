@@ -1,6 +1,6 @@
 import { ConvexError, v } from "convex/values";
 import { useMutation } from "convex/react";
-import { api } from "./_generated/api";
+import { api, internal } from "./api";
 import {
   MutationCtx,
   QueryCtx,
@@ -12,15 +12,12 @@ import { getUser } from "./users";
 import { fileTypes } from "./schema";
 import { ptypes } from "./schema";
 import { Doc, Id } from "./_generated/dataModel";
-import { subDays } from 'date-fns';
-import {Resend} from "resend";
-
-
-
+import { subDays } from "date-fns";
+import { Resend } from "resend";
 
 export const generateUploadUrl = mutation(async (ctx) => {
   const identity = await ctx.auth.getUserIdentity();
-  
+
   if (!identity) {
     throw new ConvexError("you must be logged in to upload a file");
   }
@@ -53,7 +50,6 @@ export async function hasAccessToOrg(
     user.orgIds.some((item) => item.orgId === orgId) ||
     user.tokenIdentifier.includes(orgId);
 
-
   if (!hasAccess) {
     return null;
   }
@@ -73,7 +69,6 @@ export const createFile = mutation({
   },
 
   async handler(ctx, args) {
-
     const hasAccess = await hasAccessToOrg(ctx, args.orgId);
 
     if (!hasAccess) {
@@ -176,22 +171,21 @@ export const deleteAllFiles = internalMutation({
   },
 });
 
-
 export const notifyExpiredFiles = internalMutation({
   args: {},
   async handler(ctx) {
-    
     const now = new Date();
     const fiveDaysBefore = subDays(now, 5);
 
     // Obtener archivos expirados en los últimos 5 días
     const expiredFiles = await ctx.db
       .query("files")
-      .withIndex("by_expdate", (q) =>
-        q.gte("expdate", fiveDaysBefore.getTime()) //.lt("expdate", now.getTime())
+      .withIndex(
+        "by_expdate",
+        (q) => q.gte("expdate", fiveDaysBefore.getTime()) //.lt("expdate", now.getTime())
       )
       .collect();
-      console.log(expiredFiles.length)
+    console.log(expiredFiles.length);
     if (expiredFiles.length === 0) return;
 
     // Procesar correos en lotes (máx. 50 por iteración)
@@ -201,26 +195,32 @@ export const notifyExpiredFiles = internalMutation({
 
       for (const file of batch) {
         try {
-          const result =  await ctx.runMutation(api.email.sendEmail, {
+          const emailArgs = {
+            to: "hdsalazar20@gmail.com",
+            subject: "Correo de prueba",
+            body: "Este es un correo de prueba enviado con Resend y Convex.",
+          };
+          console.log("Calling sendEmail with args:", emailArgs);
+
+    
+          const result = await ctx.runMutation(internal.email.sendEmail, {
             to: "hdsalazar20@gmail.com",
             subject: "Correo de prueba",
             body: "Este es un correo de prueba enviado con Resend y Convex.",
           });
-     
-        
+
           if (result.success) {
             console.log("Correo enviado con éxito:", result.response);
           } else {
             console.error("Error al enviar el correo:", result.error);
           }
-
           // const {data, error} = await resend.emails.send({
-          //   to: "hdsalazar20@gmail.com", 
+          //   to: "hdsalazar20@gmail.com",
           //   from: "Acme <onboarding@resend.dev>",
           //   subject: "Tu póliza está a punto de expirar",
           //  // react: undefined,
           //  html: `<p>Su póliza <strong>${file.name}</strong> está a punto de expirar, por favor esté atento!</p>`,
-          //  }) 
+          //  })
           //  console.log(error)
         } catch (error) {
           console.error("Error al enviar correo:", error);
@@ -236,9 +236,12 @@ function assertCanDeleteFile(user: Doc<"users">, file: Doc<"files">) {
     user.orgIds.find((org) => org.orgId === file.orgId)?.role === "admin";
 
   if (!canDelete) {
-    throw new ConvexError("you have no acces to delete this file");
+    throw new ConvexError("No tiene permiso para borrar esta póliza");
   }
 }
+
+
+
 
 export const deleteFile = mutation({
   args: { fileId: v.id("files") },
@@ -246,7 +249,7 @@ export const deleteFile = mutation({
     const access = await hasAccessToFile(ctx, args.fileId);
 
     if (!access) {
-      throw new ConvexError("no access to file");
+      throw new ConvexError("No tiene acceso a esta póliza");
     }
 
     assertCanDeleteFile(access.user, access.file);
@@ -263,7 +266,7 @@ export const restoreFile = mutation({
     const access = await hasAccessToFile(ctx, args.fileId);
 
     if (!access) {
-      throw new ConvexError("no access to file");
+      throw new ConvexError("No tiene acceso a esta póliza");
     }
 
     assertCanDeleteFile(access.user, access.file);
@@ -280,7 +283,7 @@ export const toggleFavorite = mutation({
     const access = await hasAccessToFile(ctx, args.fileId);
 
     if (!access) {
-      throw new ConvexError("no access to file");
+      throw new ConvexError("No tiene acceso a esta póliza");
     }
 
     const favorite = await ctx.db
@@ -343,5 +346,3 @@ async function hasAccessToFile(
 
   return { user: hasAccess.user, file };
 }
-
-

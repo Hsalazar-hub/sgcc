@@ -64,8 +64,8 @@ export function FileCardActions({
                 });
                 toast({
                   variant: "default",
-                  title: "File marked for deletion",
-                  description: "Your file will be deleted soon",
+                  title: "Póliza marcada para borrar",
+                  description: "Su póliza ha sido marcada para borrar",	
                 });
               }}
             >

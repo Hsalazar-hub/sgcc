@@ -101,15 +101,15 @@ export function FileBrowser({
           <TabsList className="mb-2">
             <TabsTrigger value="grid" className="flex gap-2 items-center">
               <GridIcon />
-              Grid
+              Grillas
             </TabsTrigger>
             <TabsTrigger value="table" className="flex gap-2 items-center">
-              <RowsIcon /> Table
+              <RowsIcon /> Tablas
             </TabsTrigger>
           </TabsList>
 
           <div className="flex gap-2 items-center">
-            <Label htmlFor="type-select">Filtrado por tipo</Label>
+            <Label htmlFor="type-select">Filtrado por tipo de póliza</Label>
             <Select
               value={ptype}
               onValueChange={(newType) => {
@@ -120,7 +120,7 @@ export function FileBrowser({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="all">Todas</SelectItem>
                 <SelectItem value="HCM">HCM</SelectItem>
                 <SelectItem value="Vehiculo">Vehiculo</SelectItem>
                 <SelectItem value="RCV de vehículos">RCV de vehículos</SelectItem>
