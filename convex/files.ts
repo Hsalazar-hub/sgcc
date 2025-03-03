@@ -202,30 +202,23 @@ export const notifyExpiredFiles = internalMutation({
       const batch = expiredFiles.slice(i, i + batchSize);
 
       for (const file of batch) {
-        const emailArgs = {
-          to: "hdsalazar@gmail.com",
-          subject: "Correo de prueba",
-          body: "Este es un correo de prueba enviado con Nodemailer.",
-        };
-      
         try {
-          const serviceID = 'service_dqvf926'; // Reemplaza con tu service ID de EmailJS
-      const templateID = 'template_f0bcxh9'; // Reemplaza con tu template ID de EmailJS
-      const userID = 'Ggl_OXBeB_FQQe9Gc'; // Reemplaza con tu user ID de EmailJS
+          const emailArgs = {
+            to: "hdsalazar20@gmail.com",
+            subject: "Correo de prueba",
+            body: `Este es un correo de prueba enviado con Resend y Convex. El archivo ${file.name} está a punto de expirar.`,
+          };
+          console.log("Calling sendEmail with args:", emailArgs);
 
-      // Parámetros del correo
-      const templateParams = {
-        to_email: emailArgs.to,
-        subject : emailArgs.subject,
-        body : emailArgs.body
-     
-      };
+          const result = await ctx.runMutation(internal.email.sendEmail, emailArgs);
 
-      // Enviar correo con EmailJS
-      const result = await emailjs.send(serviceID, templateID, templateParams, userID);
+          console.log("Result from sendEmail:", result); // Log the result
 
-      console.log("Correo enviado con éxito:", result);
-
+          if (result.success) {
+            console.log("Correo enviado con éxito:", result.response);
+          } else {
+            console.error("Error al enviar el correo:", result.error);
+          }
         } catch (error) {
           console.error("Error al enviar correo:", error);
         }
