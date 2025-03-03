@@ -10,8 +10,10 @@ import {
 } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from 'next/router';
 
 export function Header() {
+  const router = useRouter();
   return (
     <div className="relative z-10 border-b py-4 bg-gray-50">
       <div className="items-center container mx-auto justify-between flex">
@@ -30,7 +32,7 @@ export function Header() {
           <OrganizationSwitcher />
           <SignedIn>
           <SignOutButton>
-              <Button>Cerrar sesión</Button>
+              <Button onClick={() => router.push('/layout')}>Cerrar sesión</Button>
             </SignOutButton>
             </SignedIn>
           <SignedOut>
