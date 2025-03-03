@@ -1,12 +1,11 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
-export const fileTypes = v.optional(v.union(
+export const fileTypes = v.union(
   v.literal("image"),
   v.literal("csv"),
   v.literal("pdf"),
-
-));
+);
 
 export const statusflag = v.optional(v.union(
   v.literal("ongoing"),
