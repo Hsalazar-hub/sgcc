@@ -9,7 +9,7 @@ export const sendEmail = internalMutation({
     subject: v.string(),
     body: v.string(),
   },
-  handler: async ({ args }: any) => {
+  handler: async (ctx, args ) => {
     try {
       console.log("Received args:", args); // Log the received args
       if (!args) {
