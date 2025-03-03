@@ -6,6 +6,7 @@ import {
   SignedOut,
   UserButton,
   useSession,
+  SignOutButton
 } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
@@ -27,7 +28,11 @@ export function Header() {
 
         <div className="flex gap-2">
           <OrganizationSwitcher />
-          <UserButton />
+          <SignedIn>
+          <SignOutButton>
+              <Button>Cerrar sesión</Button>
+            </SignOutButton>
+            </SignedIn>
           <SignedOut>
             <SignInButton>
               <Button>Iniciar sesión</Button>
