@@ -1,11 +1,19 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
-export const fileTypes = v.union(
+export const fileTypes = v.optional(v.union(
   v.literal("image"),
   v.literal("csv"),
-  v.literal("pdf")
-);
+  v.literal("pdf"),
+
+));
+
+export const statusflag = v.optional(v.union(
+  v.literal("ongoing"),
+  v.literal("nearexpired"),
+  v.literal("expired")
+));
+
 
 export const ptypes = v.optional(v.union(
   v.literal("HCM"),
@@ -32,6 +40,7 @@ export default defineSchema({
     fileId: v.id("_storage"),
     userId: v.id("users"),
     ptype: ptypes,
+    status: statusflag,
     shouldDelete: v.optional(v.boolean()),
     expdate: v.optional(v.float64())
   })

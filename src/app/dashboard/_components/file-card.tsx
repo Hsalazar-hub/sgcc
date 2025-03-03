@@ -16,6 +16,24 @@ import { api } from "../../../../convex/_generated/api";
 import Image from "next/image";
 import { FileCardActions } from "./file-actions";
 setDefaultOptions({ locale: es });
+
+const StatusChip = ({ status }:any) => {
+  const statusMap:any = {
+    ongoing: { color: "bg-green-500", label: "En Curso" },
+    nearexpired: { color: "bg-orange-500", label: "Por Expirar" },
+    expired: { color: "bg-red-500", label: "Expirado" },
+  };
+
+  // Si el estado no existe, usa "ongoing" por defecto
+  const statusData = statusMap[status] || statusMap.ongoing;
+
+  return (
+    <span className={`px-3 py-1 text-white text-sm font-semibold rounded-full ${statusData.color}`}>
+      {statusData.label}
+    </span>
+  );
+};
+
 export function FileCard({
   file,
 }: {
@@ -29,6 +47,7 @@ export function FileCard({
     image: <ImageIcon />,
     pdf: <FileTextIcon />,
     csv: <GanttChartIcon />,
+    
   } as Record<Doc<"files">["type"], ReactNode>;
 
   return (
@@ -39,8 +58,13 @@ export function FileCard({
           {file.name}
         </CardTitle>
         <div className="absolute top-2 right-2">
+          <div className="flex gap-2">
+            <StatusChip status={file.status} />
+          
           <FileCardActions isFavorited={file.isFavorited} file={file} />
+          </div>
         </div>
+        
       </CardHeader>
       <CardContent className="h-[200px] flex justify-center items-center">
         {file.type === "image" && file.url && (

@@ -13,5 +13,19 @@ crons.interval(
   "notify users of expired files",
   { minutes: 1},  // Se ejecuta cada hora para reducir la carga
   internal.files.notifyExpiredFiles
+  
+);
+
+crons.interval(
+  "Update files to expired",
+  { minutes: 1 },
+  internal.files.updateExpiredFiles
+);
+
+
+crons.interval(
+  "Update files to near expired",
+  { minutes: 1 },
+  internal.files.updateNearExpiredFiles
 );
 export default crons;
