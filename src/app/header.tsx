@@ -10,11 +10,11 @@ import {
 } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from 'next/navigation';
+
 
 
 export function Header() {
-  const router = useRouter();
+
   return (
     <div className="relative z-10 border-b py-4 bg-gray-50">
       <div className="items-center container mx-auto justify-between flex">
@@ -32,7 +32,7 @@ export function Header() {
         <div className="flex gap-2">
           <OrganizationSwitcher />
           <SignedIn>
-          <SignOutButton signOutCallback={() => router.push('/layout')}>
+          <SignOutButton >
               <Button>Cerrar sesión</Button>
             </SignOutButton>
             </SignedIn>
