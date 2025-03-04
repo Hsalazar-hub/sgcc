@@ -12,7 +12,6 @@ export const metadata: Metadata = {
   title: "SGCS",
   description: "Sistema de Gestión para de pólizas par corredores de seguros",
 };
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -20,11 +19,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`${inter.className} flex flex-col min-h-screen`}>
         <ConvexClientProvider>
           <Toaster />
           <Header />
-          {children}
+          <main className="flex-grow">{children}</main>
           <Footer />
         </ConvexClientProvider>
       </body>

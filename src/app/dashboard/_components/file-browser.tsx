@@ -45,9 +45,7 @@ export function FileBrowser({
   favoritesOnly?: boolean;
   deletedOnly?: boolean;
 }) {
-  const organization  = useOrganization();
- 
-
+  const organization = useOrganization();
   const user = useUser();
   const [query, setQuery] = useState("");
   const [type, setType] = useState<Doc<"files">["type"] | "all">("all");
@@ -101,15 +99,18 @@ export function FileBrowser({
           <TabsList className="mb-2">
             <TabsTrigger value="grid" className="flex gap-2 items-center">
               <GridIcon />
-              Grillas
+              <span className="hidden sm:inline">Grillas</span>
             </TabsTrigger>
             <TabsTrigger value="table" className="flex gap-2 items-center">
-              <RowsIcon /> Tablas
+              <RowsIcon />
+              <span className="hidden sm:inline">Tablas</span>
             </TabsTrigger>
           </TabsList>
 
           <div className="flex gap-2 items-center">
-            <Label htmlFor="type-select">Filtrado por tipo de póliza</Label>
+            <Label htmlFor="type-select" className="hidden sm:inline">
+              Filtrado por tipo de póliza
+            </Label>
             <Select
               value={ptype}
               onValueChange={(newType) => {

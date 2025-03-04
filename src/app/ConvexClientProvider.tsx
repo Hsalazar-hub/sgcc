@@ -19,6 +19,7 @@ export default function ConvexClientProvider({
   return (
     <ClerkProvider localization={esES}
       publishableKey={convexKey}
+      signInForceRedirectUrl={process.env.NEXT_PUBLIC_CLERK_SIGN_IN_FORCE_REDIRECT_URL}
     >
       <ConvexProviderWithClerk client={convex}  useAuth={useAuth}>
         {children}

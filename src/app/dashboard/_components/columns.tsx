@@ -8,6 +8,7 @@ import { api } from "../../../../convex/_generated/api";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { FileCardActions } from "./file-actions";
 
+
 function UserCell({ userId }: { userId: Id<"users"> }) {
   const userProfile = useQuery(api.users.getUserProfile, {
     userId: userId,
@@ -24,15 +25,21 @@ function UserCell({ userId }: { userId: Id<"users"> }) {
 }
 
 export const columns: ColumnDef<
-Doc<"files"> & { isFavorited: boolean; url: string | null; }
+  Doc<"files"> & { isFavorited: boolean; url: string | null }
 >[] = [
   {
     accessorKey: "name",
     header: "Nombre",
+    cell: ({ row }) => (
+      <div className="truncate max-w-xs">{row.original.name}</div>
+    ),
   },
   {
     accessorKey: "type",
     header: "Tipo",
+    cell: ({ row }) => (
+      <div className="truncate max-w-xs">{row.original.ptype}</div>
+    ),
   },
   {
     header: "Usuario",
@@ -44,7 +51,7 @@ Doc<"files"> & { isFavorited: boolean; url: string | null; }
     header: "Súbida el",
     cell: ({ row }) => {
       return (
-        <div>
+        <div className="truncate max-w-xs">
           {formatRelative(new Date(row.original._creationTime), new Date())}
         </div>
       );
@@ -54,7 +61,7 @@ Doc<"files"> & { isFavorited: boolean; url: string | null; }
     header: "Acciones",
     cell: ({ row }) => {
       return (
-        <div>
+        <div className="flex gap-2">
           <FileCardActions
             file={row.original}
             isFavorited={row.original.isFavorited}

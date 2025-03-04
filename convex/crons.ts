@@ -34,7 +34,7 @@ crons.interval(
 
 crons.interval(
   "Send email",
-  { minutes: 1 },
+  { hours: 10 },
   api.email.sendEmail
  
 );

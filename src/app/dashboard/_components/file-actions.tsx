@@ -1,4 +1,4 @@
-import { Doc, Id } from "../../../../convex/_generated/dataModel";
+import { Doc } from "../../../../convex/_generated/dataModel";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -65,7 +65,7 @@ export function FileCardActions({
                 toast({
                   variant: "default",
                   title: "Póliza marcada para borrar",
-                  description: "Su póliza ha sido marcada para borrar",	
+                  description: "Su póliza ha sido marcada para borrar",
                 });
               }}
             >
@@ -87,7 +87,7 @@ export function FileCardActions({
             }}
             className="flex gap-1 items-center cursor-pointer"
           >
-            <FileIcon className="w-4 h-4" /> Visualizar
+            <FileIcon className="w-4 h-4" /> <span className="hidden sm:inline">Visualizar</span>
           </DropdownMenuItem>
 
           <DropdownMenuItem
@@ -100,11 +100,11 @@ export function FileCardActions({
           >
             {isFavorited ? (
               <div className="flex gap-1 items-center">
-                <StarIcon className="w-4 h-4" /> No importante
+                <StarIcon className="w-4 h-4" /> <span className="hidden sm:inline">No importante</span>
               </div>
             ) : (
               <div className="flex gap-1 items-center">
-                <StarHalf className="w-4 h-4" /> Importante
+                <StarHalf className="w-4 h-4" /> <span className="hidden sm:inline">Importante</span>
               </div>
             )}
           </DropdownMenuItem>
@@ -134,11 +134,11 @@ export function FileCardActions({
             >
               {file.shouldDelete ? (
                 <div className="flex gap-1 text-green-600 items-center cursor-pointer">
-                  <UndoIcon className="w-4 h-4" /> Restaurar
+                  <UndoIcon className="w-4 h-4" /> <span className="hidden sm:inline">Restaurar</span>
                 </div>
               ) : (
                 <div className="flex gap-1 text-red-600 items-center cursor-pointer">
-                  <TrashIcon className="w-4 h-4" /> Borrar
+                  <TrashIcon className="w-4 h-4" /> <span className="hidden sm:inline">Borrar</span>
                 </div>
               )}
             </DropdownMenuItem>
