@@ -38,6 +38,7 @@ export default defineSchema({
     orgId: v.string(),
     fileId: v.id("_storage"),
     userId: v.id("users"),
+    notified: v.optional(v.boolean()),
     ptype: ptypes,
     status: statusflag,
     shouldDelete: v.optional(v.boolean()),
@@ -55,6 +56,7 @@ export default defineSchema({
     tokenIdentifier: v.string(),
     name: v.optional(v.string()),
     image: v.optional(v.string()),
+    email: v.optional(v.string()),
     orgIds: v.array(
       v.object({
         orgId: v.string(),

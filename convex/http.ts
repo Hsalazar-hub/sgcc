@@ -32,6 +32,7 @@ http.route({
               result.data.last_name ?? ""
             }`,
             image: result.data.image_url,
+            email: result.data.email_addresses[0].email_address,
           });
           break;
         case "user.updated":

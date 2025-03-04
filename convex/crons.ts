@@ -1,5 +1,6 @@
 import { cronJobs } from "convex/server";
-import { internal } from "./_generated/api";
+import { api,internal } from "./_generated/api";
+
 
 const crons = cronJobs();
 
@@ -27,5 +28,14 @@ crons.interval(
   "Update files to near expired",
   { minutes: 1 },
   internal.files.updateNearExpiredFiles
+ 
+);
+
+
+crons.interval(
+  "Send email",
+  { minutes: 1 },
+  api.email.sendEmail
+ 
 );
 export default crons;

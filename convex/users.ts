@@ -33,7 +33,7 @@ export async function getUser(
 }
 
 export const createUser = internalMutation({
-  args: { tokenIdentifier: v.string(), name: v.string(), image: v.string() },
+  args: { tokenIdentifier: v.string(), name: v.string(), image: v.string(), email: v.string() },
  
   async handler(ctx, args) { 
     await ctx.db.insert("users", {
@@ -41,6 +41,7 @@ export const createUser = internalMutation({
       orgIds: [],
       name: args.name,
       image: args.image,
+      email: args.email,
     });
     
   },

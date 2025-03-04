@@ -1,6 +1,6 @@
 import { ConvexError, v } from "convex/values";
 import { useAction, useMutation } from "convex/react";
-import { api, internal } from "./api";
+import { api,internal } from "./_generated/api";
 import {
   MutationCtx,
   QueryCtx,
@@ -202,26 +202,28 @@ export const notifyExpiredFiles = internalMutation({
       const batch = expiredFiles.slice(i, i + batchSize);
 
       for (const file of batch) {
-        try {
-          const emailArgs = {
-            to: "hdsalazar20@gmail.com",
-            subject: "Correo de prueba",
-            body: `Este es un correo de prueba enviado con Resend y Convex. El archivo ${file.name} está a punto de expirar.`,
-          };
-          console.log("Calling sendEmail with args:", emailArgs);
+        // try {
+        //   const emailArgs = {
+        //     to: "hdsalazar20@gmail.com",
+        //     subject: "Correo de prueba",
+        //     body: `Este es un correo de prueba enviado con Resend y Convex. El archivo ${file.name} está a punto de expirar.`,
+        //   };
+        //   console.log("Calling sendEmail with args:", emailArgs);
 
-          const result = await ctx.runMutation(internal.email.sendEmail, emailArgs);
+        //   const action =  useAction(api.email.sendEmail);
+        //   const result =  await action(emailArgs);
 
-          console.log("Result from sendEmail:", result); // Log the result
 
-          if (result.success) {
-            console.log("Correo enviado con éxito:", result.response);
-          } else {
-            console.error("Error al enviar el correo:", result.error);
-          }
-        } catch (error) {
-          console.error("Error al enviar correo:", error);
-        }
+        //   console.log("Result from sendEmail:", result); // Log the result
+
+        //   if (result.success) {
+        //     console.log("Correo enviado con éxito:", result.response);
+        //   } else {
+        //     console.error("Error al enviar el correo:", result.error);
+        //   }
+        // } catch (error) {
+        //   console.error("Error al enviar correo:", error);
+        // }
       }
     }
   },

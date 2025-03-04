@@ -1,35 +1,92 @@
-import { internalMutation } from "./_generated/server";
+import { action, internalMutation, internalQuery } from "./_generated/server";
 import { Resend } from "resend";
-export const resend = new Resend("re_Xeq6c2mE_14iuFx8Tt4NqnEHZDKj75XCX");
 import { v } from "convex/values";
+import { internal } from "./_generated/api";
+import { addDays } from "date-fns";
 
-export const sendEmail = internalMutation({
+
+export const sendEmail = action({
   args: {
-    to: v.string(),
-    subject: v.string(),
-    body: v.string(),
+  
   },
-  handler: async (ctx, args ) => {
+  handler: async (ctx) => {
+ 
     try {
-      console.log("Received args:", args); // Log the received args
-      if (!args) {
-        throw new Error("Args are undefined");
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      const expiredFiles = await ctx.runQuery(internal.email.notifyExpiredFiles, {}
+      );
+
+      const sentlist = [];
+      for (const file of expiredFiles) {
+
+        try {
+          await resend.emails.send({
+            from: "onboarding@resend.dev",
+            to: "hdsalazar20@gmail.com",
+               subject: "Su poliza de seguro está a punto de expirar",
+                html: `Este es un correo de prueba enviado con Resend y Convex. El archivo <strong> ${file.name}</strong> está a punto de expirar.`,
+          });
+          sentlist.push(file._id);
+        } catch (error) {
+          console.error(error);
+        }
+      
       }
-      const { to, subject, body } = args;
+      await ctx.runMutation(internal.email.markFilesAsNotified, { ids: sentlist });
 
-      console.log("Destructured args:", { to, subject, body }); // Log destructured args
-
-      const response = await resend.emails.send({
-        from: "Acme <onboarding@resend.dev>",
-        to,
-        subject,
-        html: `<p>${body}</p>`,
-      });
-
-      return { success: true, response };
-    } catch (error: any) {
-      console.error("Error sending email:", error);
-      return { success: false, error: error.message };
+    } catch (error) {
+      console.log(error);
     }
   },
+});
+
+
+ export const notifyExpiredFiles = internalQuery({
+  args: {},
+  async handler(ctx) {
+    try {
+      const now = new Date();
+      const fiveDaysAfter = addDays(now, 5);
+  
+      // Obtener archivos expirados en los últimos 5 días
+      const expiredFiles = await ctx.db
+        .query("files")
+        .withIndex(
+          "by_expdate",
+          (q) =>
+            q.gte("expdate", now.getTime()).lte("expdate", fiveDaysAfter.getTime())
+        )
+        .collect();
+  
+        const filteredExpiredFiles = expiredFiles.filter((file) => !file.notified);
+
+      console.log("Archivos por notificar encontrados:", filteredExpiredFiles.length);
+      if (filteredExpiredFiles.length === 0) return [];
+      return filteredExpiredFiles;
+  
+    } catch (error) {
+      console.error(error);
+      return []
+      
+    }
+   
+      }
+    }
+  
+  ,
+);
+
+export const markFilesAsNotified = internalMutation({
+  args: { ids: v.array(v.any()) },
+
+  async handler(ctx, args) {
+    try {
+      Promise.all(args.ids.map(( id ) => ctx.db.patch(id, {notified: true  })));
+      
+   
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
 });
