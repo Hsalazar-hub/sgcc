@@ -327,7 +327,6 @@ function assertCanDeleteFile(user: Doc<"users">, file: Doc<"files">) {
 
 
 
-
 export const deleteFile = mutation({
   args: { fileId: v.id("files") },
   async handler(ctx, args) {
