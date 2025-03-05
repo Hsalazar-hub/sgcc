@@ -314,17 +314,15 @@ export const updateExpiredFiles = internalMutation({
     }
   },
 });
-
 function assertCanDeleteFile(user: Doc<"users">, file: Doc<"files">) {
   const canDelete =
     file.userId === user._id ||
-    user.orgIds.find((org) => org.orgId === file.orgId)?.role === "admin";
+    user.orgIds.some((org) => org.orgId === file.orgId && org.role === "admin");
 
   if (!canDelete) {
     throw new ConvexError("No tiene permiso para borrar esta póliza");
   }
 }
-
 
 
 export const deleteFile = mutation({
