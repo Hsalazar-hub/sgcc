@@ -24,7 +24,7 @@ export const sendEmail = action({
             from: "onboarding@resend.dev",
             to: "hdsalazar20@gmail.com",
                subject: "Su poliza de seguro está a punto de expirar",
-                html: `Este es un correo de prueba enviado con Resend y Convex. El archivo <strong> ${file.name}</strong> está a punto de expirar.`,
+                html: `Este es un correo de prueba enviado con Resend y Convex. La póliza <strong> ${file.name}</strong> está a punto de expirar.`,
           });
           sentlist.push(file._id);
         } catch (error) {
@@ -60,7 +60,7 @@ export const sendEmail = action({
   
         const filteredExpiredFiles = expiredFiles.filter((file) => !file.notified);
 
-      console.log("Archivos por notificar encontrados:", filteredExpiredFiles.length);
+      console.log("Pólizas por notificar encontrados:", filteredExpiredFiles.length);
       if (filteredExpiredFiles.length === 0) return [];
       return filteredExpiredFiles;
   

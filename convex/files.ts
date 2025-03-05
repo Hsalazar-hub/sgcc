@@ -60,6 +60,9 @@ export async function hasAccessToOrg(
 export const createFile = mutation({
   args: {
     name: v.string(),
+    cname: v.optional(v.string()),
+    cnumber: v.optional(v.string()),
+    email: v.optional(v.string()),
     fileId: v.id("_storage"),
     orgId: v.string(),
     type: fileTypes,
@@ -78,6 +81,9 @@ export const createFile = mutation({
 
     await ctx.db.insert("files", {
       name: args.name,
+      cname: args.cname,
+      cnumber: args.cnumber,
+      email: args.email,
       orgId: args.orgId,
       monto: args.monto,
       fileId: args.fileId,
@@ -100,6 +106,9 @@ export const getFiles = query({
     favorites: v.optional(v.boolean()),
     deletedOnly: v.optional(v.boolean()),
     type: v.optional(fileTypes),
+    cname: v.optional(v.string()),
+    cnumber: v.optional(v.string()),
+    email: v.optional(v.string()),
     ptype: v.optional(ptypes),
     status: v.optional(v.string()),
   },
@@ -174,6 +183,24 @@ export const deleteAllFiles = internalMutation({
         return await ctx.db.delete(file._id);
       })
     );
+  },
+});
+
+
+export const getMontoGroupedByOrgId = query({
+  args: {},
+  async handler(ctx) {
+    const files = await ctx.db.query("files").collect();
+
+    const groupedByOrgId = files.reduce((acc, file) => {
+      if (!acc[file.orgId]) {
+        acc[file.orgId] = 0;
+      }
+      acc[file.orgId] += file.monto ?? 0;
+      return acc;
+    }, {} as Record<string, number>);
+
+    return groupedByOrgId;
   },
 });
 

@@ -29,8 +29,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import { date, number, z, ZodNumber } from "zod";
-
+import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
@@ -38,22 +37,22 @@ import { useToast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
 import { Doc } from "../../../../convex/_generated/dataModel";
 
-
 const formSchema = z.object({
   title: z.string().min(1).max(200),
-  
   file: z
     .custom<FileList>((val) => val instanceof FileList, "Required")
     .refine((files) => files.length > 0, `Required`),
   monto: z.number(),
   expdate: z.date(),
   ptype: z.string(),
+  cname: z.string(),
+  email: z.string().email(),
+  cnumber: z.string(),
 });
 
 export function UploadButton() {
   const { toast } = useToast();
   const organization = useOrganization();
- 
   const user = useUser();
   const generateUploadUrl = useMutation(api.files.generateUploadUrl);
 
@@ -62,14 +61,17 @@ export function UploadButton() {
     defaultValues: {
       title: "",
       file: undefined,
-      monto:0,
+      monto: 0,
+      cname: "",
+      email: "",
+      cnumber: "",
       expdate: new Date(),
       ptype: undefined,
     },
   });
 
   const fileRef = form.register("file");
-  
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (!orgId) return;
 
@@ -77,9 +79,9 @@ export function UploadButton() {
     const postUrl = await generateUploadUrl();
 
     const fileType = values.file[0].type;
-    
-    data.expdate = new Date(data.expdate).getTime()
-  
+
+    data.expdate = new Date(data.expdate).getTime();
+
     const result = await fetch(postUrl, {
       method: "POST",
       headers: { "Content-Type": fileType },
@@ -94,23 +96,22 @@ export function UploadButton() {
       "text/csv": "csv",
     } as Record<string, Doc<"files">["type"]>;
 
-
-
     try {
       const newfile = {
         name: data.title,
         fileId: storageId,
         expdate: data.expdate,
         orgId,
+        cname: data.cname,
+        email: data.email,
+        cnumber: data.cnumber,
         monto: +data.monto,
         type: types[fileType],
         ptype: data.ptype,
       };
 
       console.log("fileType: ", fileType);
-
       console.log("types: ", types);
-
       console.log("data: ", data);
       console.log("data: ", newfile);
 
@@ -156,12 +157,10 @@ export function UploadButton() {
       <DialogTrigger asChild>
         <Button>Añadir Póliza</Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-w-lg w-full mx-auto sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle className="mb-8">Añada su póliza</DialogTitle>
-          <DialogDescription>
-            
-          </DialogDescription>
+          <DialogDescription></DialogDescription>
         </DialogHeader>
 
         <div>
@@ -180,34 +179,87 @@ export function UploadButton() {
                   </FormItem>
                 )}
               />
-               <FormField
+              <FormField
+                control={form.control}
+                name="cname"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nombre del Tomador:</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="cnumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Numero del tomador</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Correo del tomador</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
                 control={form.control}
                 name="ptype"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Tipo de póliza</FormLabel>
                     <Select
-                        
-                        onValueChange={field.onChange} defaultValue={field.value}
-                      >
-                    <FormControl>
-                      <SelectTrigger id="type-select">
-                       <SelectValue />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger id="type-select">
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
                         <SelectItem value="HCM">HCM</SelectItem>
                         <SelectItem value="Vehiculo">Vehiculo</SelectItem>
-                        <SelectItem value="RCV de vehículos">RCV de vehículos</SelectItem>
-                        <SelectItem value="RCV de embarcacion">RCV de embarcacion</SelectItem>
-                        <SelectItem value="RCV de aviación">RCV de aviación</SelectItem>
+                        <SelectItem value="RCV de vehículos">
+                          RCV de vehículos
+                        </SelectItem>
+                        <SelectItem value="RCV de embarcacion">
+                          RCV de embarcacion
+                        </SelectItem>
+                        <SelectItem value="RCV de aviación">
+                          RCV de aviación
+                        </SelectItem>
                         <SelectItem value="Incendios">Incendios</SelectItem>
-                        <SelectItem value="Combinado Residencial">Combinado Residencial</SelectItem>
-                        <SelectItem value="Accidentes personales">Accidentes personales</SelectItem>
-                        <SelectItem value="Poliza de vida">Poliza de vida</SelectItem>
-                        <SelectItem value="Poliza Empresarial">Poliza Empresarial</SelectItem>
+                        <SelectItem value="Combinado Residencial">
+                          Combinado Residencial
+                        </SelectItem>
+                        <SelectItem value="Accidentes personales">
+                          Accidentes personales
+                        </SelectItem>
+                        <SelectItem value="Poliza de vida">
+                          Poliza de vida
+                        </SelectItem>
+                        <SelectItem value="Poliza Empresarial">
+                          Poliza Empresarial
+                        </SelectItem>
                       </SelectContent>
-                      </Select >
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -215,15 +267,15 @@ export function UploadButton() {
               <FormField
                 control={form.control}
                 name="monto"
-                render={({field} ) => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>Monto</FormLabel>
                     <FormControl>
-                    <Input
+                      <Input
                         id="monto"
                         type="number"
                         {...field}
-                        value={field.value || ''}
+                        value={field.value || ""}
                         onChange={(e) => field.onChange(Number(e.target.value))}
                       />
                     </FormControl>
@@ -231,18 +283,22 @@ export function UploadButton() {
                   </FormItem>
                 )}
               />
-                     <FormField
+              <FormField
                 control={form.control}
                 name="expdate"
-                render={({field} ) => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>Fecha de expiración</FormLabel>
                     <FormControl>
-                    <Input
+                      <Input
                         id="expdate"
                         type="date"
                         {...field}
-                        value={field.value ? new Date(field.value).toISOString().split('T')[0] : ''} 
+                        value={
+                          field.value
+                            ? new Date(field.value).toISOString().split("T")[0]
+                            : ""
+                        }
                         onChange={(e) => field.onChange(new Date(e.target.value))}
                       />
                     </FormControl>

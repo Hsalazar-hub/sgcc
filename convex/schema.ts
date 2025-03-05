@@ -39,8 +39,11 @@ export default defineSchema({
     fileId: v.id("_storage"),
     userId: v.id("users"),
     notified: v.optional(v.boolean()),
+    cname: v.optional(v.string()),
+    cnumber: v.optional(v.string()),
     ptype: ptypes,
     status: statusflag,
+    email: v.optional(v.string()),
     shouldDelete: v.optional(v.boolean()),
     expdate: v.optional(v.float64())
   })

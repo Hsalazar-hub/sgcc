@@ -81,10 +81,22 @@ export function FileCard({
           <span className="truncate">{userProfile?.name}</span>
         </div>
         <div className="hidden sm:block text-xs text-gray-700 truncate">
-          Monto {file.monto}$
+          Tomador: {file.cname}
         </div>
         <div className="hidden sm:block text-xs text-gray-700 truncate">
+          Correo: {file.email}
+        </div>
+        <div className="hidden sm:block text-xs text-gray-700 truncate">
+          Numero de telefono: {file.cnumber}
+        </div>
+        <div className="hidden sm:block text-xs text-gray-700 truncate">
+          Monto: {file.monto}$
+        </div>
+        {/* <div className="hidden sm:block text-xs text-gray-700 truncate">
           Subida el {formatRelative(new Date(file._creationTime), new Date())}
+        </div> */}
+          <div className="hidden sm:block text-xs text-gray-700 truncate">
+          Tipo de póliza: {file.ptype}
         </div>
         <div className="hidden sm:block text-xs text-gray-700 truncate">
           {file.expdate ? (
@@ -93,9 +105,7 @@ export function FileCard({
             <div>Sin fecha de expiración</div>
           )}
         </div>
-        <div className="hidden sm:block text-xs text-gray-700 truncate">
-          Tipo de póliza: {file.ptype}
-        </div>
+      
         <div className="flex sm:hidden flex-col gap-2 mt-2 w-full">
           <span className="truncate text-xs text-gray-700">{file.name}</span>
           <div className="flex gap-2">
