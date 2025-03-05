@@ -318,7 +318,7 @@ function assertCanDeleteFile(user: Doc<"users">, file: Doc<"files">) {
   const canDelete =
     file.userId === user._id ||
     user.orgIds.some((org) => org.orgId === file.orgId && org.role === "admin");
-
+    console.log("canDelete: ", canDelete);
   if (!canDelete) {
     throw new ConvexError("No tiene permiso para borrar esta póliza");
   }

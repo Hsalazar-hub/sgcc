@@ -18,7 +18,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import {
   Dialog,
@@ -36,6 +36,8 @@ import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
 import { Doc } from "../../../../convex/_generated/dataModel";
+
+
 
 const formSchema = z.object({
   title: z.string().min(1).max(200),
@@ -138,14 +140,20 @@ export function UploadButton() {
   }
 
   let orgId: string | undefined = undefined;
+  let userRole: string | undefined = undefined;
+
   if (organization.isLoaded && user.isLoaded) {
     orgId = organization.organization?.id ?? user.user?.id;
+    userRole = organization.membership?.role;
   }
-
+console.log('userRole: ', userRole);
   const [isFileDialogOpen, setIsFileDialogOpen] = useState(false);
 
   const createFile = useMutation(api.files.createFile);
 
+  if (userRole === "org:member") {
+    return null; // Hide the component if the user is a member
+  }
   return (
     <Dialog
       open={isFileDialogOpen}
