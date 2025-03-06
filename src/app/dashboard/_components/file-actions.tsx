@@ -50,7 +50,7 @@ export function FileCardActions({
       <AlertDialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Esta seguro?</AlertDialogTitle>
+            <AlertDialogTitle>¿Está seguro?</AlertDialogTitle>
             <AlertDialogDescription>
               Esta opción marcará la póliza y la colocará en la lista de borrado.
             </AlertDialogDescription>
@@ -69,7 +69,7 @@ export function FileCardActions({
                 });
               }}
             >
-              Continue
+              Continuar
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
