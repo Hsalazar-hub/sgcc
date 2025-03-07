@@ -33,11 +33,11 @@ export function SideNav() {
           }
         )}
       >
-        <Link href="/dashboard/files">
+        <Link href="/dashboard/polizas">
           <Button
             variant={"link"}
             className={clsx("flex gap-2", {
-              "text-blue-500": pathname.includes("/dashboard/files"),
+              "text-blue-500": pathname.includes("/dashboard/polizas"),
             })}
           >
             <FileIcon /> Todas las Pólizas
