@@ -39,7 +39,7 @@ export function PolizaCardActions({
 }) {
   const deletepoliza = useMutation(api.polizas.deletepoliza);
   const restorepoliza = useMutation(api.polizas.restorepoliza);
-  const toggleFavorite = useMutation(api.polizas.toggleFavorite);
+  // const toggleFavorite = useMutation(api.polizas.toggleFavorite);
   const { toast } = useToast();
   const me = useQuery(api.corredores.getMe);
 
@@ -90,7 +90,7 @@ export function PolizaCardActions({
             <FileIcon className="w-4 h-4" /> <span className="hidden sm:inline">Visualizar</span>
           </DropdownMenuItem>
 
-          <DropdownMenuItem
+          {/* <DropdownMenuItem
             onClick={() => {
               toggleFavorite({
                 polizaId: poliza._id,
@@ -107,7 +107,7 @@ export function PolizaCardActions({
                 <StarHalf className="w-4 h-4" /> <span className="hidden sm:inline">Importante</span>
               </div>
             )}
-          </DropdownMenuItem>
+          </DropdownMenuItem> */}
 
           <Protect
             condition={(check) => {

@@ -56,10 +56,10 @@ export function FileBrowser({
     orgId = organization.organization?.id ?? user.user?.id;
   }
 
-  const favorites = useQuery(
-    api.polizas.getAllFavorites,
-    orgId ? { orgId } : "skip"
-  );
+  // const favorites = useQuery(
+  //   api.polizas.getAllFavorites,
+  //   orgId ? { orgId } : "skip"
+  // );
 
   const polizas = useQuery(
     api.polizas.getpolizas,
@@ -76,13 +76,13 @@ export function FileBrowser({
   );
   const isLoading = polizas === undefined;
 
-  const modifiedpolizas =
-    polizas?.map((poliza) => ({
-      ...poliza,
-      isFavorited: (favorites ?? []).some(
-        (favorite) => favorite.polizaId === poliza._id
-      ),
-    })) ?? [];
+  // const modifiedpolizas =
+  //   polizas?.map((poliza) => ({
+  //     ...poliza,
+  //     isFavorited: (favorites ?? []).some(
+  //       (favorite) => favorite.polizaId === poliza._id
+  //     ),
+  //   })) ?? [];
 
   return (
     <div>
@@ -145,14 +145,14 @@ export function FileBrowser({
         )}
 
         <TabsContent value="grid">
-          <div className="grid grid-cols-3 gap-4">
+          {/* <div className="grid grid-cols-3 gap-4">
             {modifiedpolizas?.map((poliza) => {
               return <PolizaCard key={poliza._id} poliza={poliza} />;
             })}
-          </div>
+          </div> */}
         </TabsContent>
         <TabsContent value="table">
-          <DataTable columns={columns} data={modifiedpolizas} />
+          {/* <DataTable columns={columns} data={modifiedpolizas} /> */}
         </TabsContent>
       </Tabs>
 

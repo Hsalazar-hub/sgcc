@@ -43,18 +43,21 @@ export default defineSchema({
     cnumber: v.optional(v.string()),
     ptype: ptypes,
     status: statusflag,
+    important: v.optional(v.boolean()),
     email: v.optional(v.string()),
     shouldDelete: v.optional(v.boolean()),
     expdate: v.optional(v.float64())
   })
     .index("by_orgId", ["orgId"])
+    .index("by_corredorId", ["corredorId"])
+    .index("by_polizaId", ["polizaId"])
     .index("by_expdate", ["expdate"])
     .index("by_shouldDelete", ["shouldDelete"]),
-  favorites: defineTable({
-    polizaId: v.id("polizas"),
+
+  aseguradoras: defineTable({
+    name: v.string(),
     orgId: v.string(),
-    corredorId: v.id("corredores"),
-  }).index("by_corredorId_orgId_polizaId", ["corredorId", "orgId", "polizaId"]),
+  }).index("by_orgId", ["orgId"]),
   corredores: defineTable({
     tokenIdentifier: v.string(),
     name: v.optional(v.string()),

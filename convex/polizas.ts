@@ -70,6 +70,7 @@ export const createpoliza = mutation({
     expdate: v.float64(),
     monto: v.float64(),
     status: statusflag,
+    important: v.optional(v.boolean()),
   },
 
   async handler(ctx, args) {
@@ -88,6 +89,7 @@ export const createpoliza = mutation({
       monto: args.monto,
       polizaId: args.polizaId,
       type: args.type,
+      important: args.important,
       expdate: args.expdate,
       corredorId: hasAccess.corredor._id,
       ptype: args.ptype,
@@ -105,6 +107,7 @@ export const getpolizas = query({
     query: v.optional(v.string()),
     favorites: v.optional(v.boolean()),
     deletedOnly: v.optional(v.boolean()),
+    important: v.optional(v.boolean()),
     type: v.optional(fileTypes),
     cname: v.optional(v.string()),
     cnumber: v.optional(v.string()),
@@ -132,18 +135,7 @@ export const getpolizas = query({
       );
     }
 
-    if (args.favorites) {
-      const favorites = await ctx.db
-        .query("favorites")
-        .withIndex("by_corredorId_orgId_polizaId", (q) =>
-          q.eq("corredorId", hasAccess.corredor._id).eq("orgId", args.orgId)
-        )
-        .collect();
-
-      polizas = polizas.filter((poliza) =>
-        favorites.some((favorite) => favorite.polizaId === poliza._id)
-      );
-    }
+   
 
     if (args.deletedOnly) {
       polizas = polizas.filter((poliza) => poliza.shouldDelete);
@@ -291,36 +283,36 @@ export const restorepoliza = mutation({
   },
 });
 
-export const toggleFavorite = mutation({
-  args: { polizaId: v.id("polizas") },
-  async handler(ctx, args) {
-    const access = await hasAccessTopoliza(ctx, args.polizaId);
+// export const toggleFavorite = mutation({
+//   args: { polizaId: v.id("polizas") },
+//   async handler(ctx, args) {
+//     const access = await hasAccessTopoliza(ctx, args.polizaId);
 
-    if (!access) {
-      throw new ConvexError("No tiene acceso a esta póliza");
-    }
+//     if (!access) {
+//       throw new ConvexError("No tiene acceso a esta póliza");
+//     }
 
-    const favorite = await ctx.db
-      .query("favorites")
-      .withIndex("by_corredorId_orgId_polizaId", (q) =>
-        q
-          .eq("corredorId", access.corredor._id)
-          .eq("orgId", access.poliza.orgId)
-          .eq("polizaId", access.poliza._id)
-      )
-      .first();
+//     const favorite = await ctx.db
+//       .query("favorites")
+//       .withIndex("by_corredorId_orgId_polizaId", (q) =>
+//         q
+//           .eq("corredorId", access.corredor._id)
+//           .eq("orgId", access.poliza.orgId)
+//           .eq("polizaId", access.poliza._id)
+//       )
+//       .first();
 
-    if (!favorite) {
-      await ctx.db.insert("favorites", {
-        polizaId: access.poliza._id,
-        corredorId: access.corredor._id,
-        orgId: access.poliza.orgId,
-      });
-    } else {
-      await ctx.db.delete(favorite._id);
-    }
-  },
-});
+//     if (!favorite) {
+//       await ctx.db.insert("favorites", {
+//         polizaId: access.poliza._id,
+//         corredorId: access.corredor._id,
+//         orgId: access.poliza.orgId,
+//       });
+//     } else {
+//       await ctx.db.delete(favorite._id);
+//     }
+//   },
+// });
 
 
 
@@ -360,25 +352,25 @@ export const toggleFavorite = mutation({
 );
 
 
-export const getAllFavorites = query({
-  args: { orgId: v.string() },
-  async handler(ctx, args) {
-    const hasAccess = await hasAccessToOrg(ctx, args.orgId);
+// export const getAllFavorites = query({
+//   args: { orgId: v.string() },
+//   async handler(ctx, args) {
+//     const hasAccess = await hasAccessToOrg(ctx, args.orgId);
 
-    if (!hasAccess) {
-      return [];
-    }
+//     if (!hasAccess) {
+//       return [];
+//     }
 
-    const favorites = await ctx.db
-      .query("favorites")
-      .withIndex("by_corredorId_orgId_polizaId", (q) =>
-        q.eq("corredorId", hasAccess.corredor._id).eq("orgId", args.orgId)
-      )
-      .collect();
+//     const favorites = await ctx.db
+//       .query("favorites")
+//       .withIndex("by_corredorId_orgId_polizaId", (q) =>
+//         q.eq("corredorId", hasAccess.corredor._id).eq("orgId", args.orgId)
+//       )
+//       .collect();
 
-    return favorites;
-  },
-});
+//     return favorites;
+//   },
+// });
 
 async function hasAccessTopoliza(
   ctx: QueryCtx | MutationCtx,
