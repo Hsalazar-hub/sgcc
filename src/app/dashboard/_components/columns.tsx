@@ -6,26 +6,27 @@ import { formatRelative } from "date-fns";
 import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { FileCardActions } from "./file-actions";
+import { PolizaCardActions } from "./poliza-actions";
+import { UserProfile } from "@clerk/clerk-react";
 
 
-function UserCell({ userId }: { userId: Id<"users"> }) {
-  const userProfile = useQuery(api.users.getUserProfile, {
-    userId: userId,
+function UserCell({ corredorId }: { corredorId: Id<"corredores"> }) {
+  const UserProfile = useQuery(api.corredores.getUserProfile, {
+    corredorId: corredorId,
   });
   return (
     <div className="flex gap-2 text-xs text-gray-700 w-40 items-center">
       <Avatar className="w-6 h-6">
-        <AvatarImage src={userProfile?.image} />
+        <AvatarImage src={UserProfile?.image} />
         <AvatarFallback>CN</AvatarFallback>
       </Avatar>
-      {userProfile?.name}
+      {UserProfile?.name}
     </div>
   );
 }
 
 export const columns: ColumnDef<
-  Doc<"files"> & { isFavorited: boolean; url: string | null }
+  Doc<"polizas"> & { isFavorited: boolean; url: string | null }
 >[] = [
   {
     accessorKey: "name",
@@ -44,7 +45,7 @@ export const columns: ColumnDef<
   {
     header: "Usuario",
     cell: ({ row }) => {
-      return <UserCell userId={row.original.userId} />;
+      return <UserCell corredorId={row.original.corredorId} />;
     },
   },
   {
@@ -62,8 +63,8 @@ export const columns: ColumnDef<
     cell: ({ row }) => {
       return (
         <div className="flex gap-2">
-          <FileCardActions
-            file={row.original}
+          <PolizaCardActions
+            poliza={row.original}
             isFavorited={row.original.isFavorited}
           />
         </div>

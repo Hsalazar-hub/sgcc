@@ -13,26 +13,26 @@ export const sendEmail = action({
  
     try {
       const resend = new Resend(process.env.RESEND_API_KEY);
-      const expiredFiles = await ctx.runQuery(internal.email.notifyExpiredFiles, {}
+      const expiredpolizas = await ctx.runQuery(internal.email.notifyExpiredpolizas, {}
       );
 
       const sentlist = [];
-      for (const file of expiredFiles) {
+      for (const poliza of expiredpolizas) {
 
         try {
           await resend.emails.send({
             from: "onboarding@resend.dev",
             to: "hdsalazar20@gmail.com",
                subject: "Su poliza de seguro está a punto de expirar",
-                html: `Este es un correo de prueba enviado con Resend y Convex. La póliza <strong> ${file.name}</strong> está a punto de expirar.`,
+                html: `Este es un correo de prueba enviado con Resend y Convex. La póliza <strong> ${poliza.name}</strong> está a punto de expirar.`,
           });
-          sentlist.push(file._id);
+          sentlist.push(poliza._id);
         } catch (error) {
           console.error(error);
         }
       
       }
-      await ctx.runMutation(internal.email.markFilesAsNotified, { ids: sentlist });
+      await ctx.runMutation(internal.email.markpolizasAsNotified, { ids: sentlist });
 
     } catch (error) {
       console.log(error);
@@ -41,7 +41,7 @@ export const sendEmail = action({
 });
 
 
- export const notifyExpiredFiles = internalQuery({
+ export const notifyExpiredpolizas = internalQuery({
   args: {},
   async handler(ctx) {
     try {
@@ -49,8 +49,8 @@ export const sendEmail = action({
       const fiveDaysAfter = addDays(now, 5);
   
       // Obtener archivos expirados en los últimos 5 días
-      const expiredFiles = await ctx.db
-        .query("files")
+      const expiredpolizas = await ctx.db
+        .query("polizas")
         .withIndex(
           "by_expdate",
           (q) =>
@@ -58,11 +58,11 @@ export const sendEmail = action({
         )
         .collect();
   
-        const filteredExpiredFiles = expiredFiles.filter((file) => !file.notified);
+        const filteredExpiredpolizas = expiredpolizas.filter((poliza) => !poliza.notified);
 
-      console.log("Pólizas por notificar encontrados:", filteredExpiredFiles.length);
-      if (filteredExpiredFiles.length === 0) return [];
-      return filteredExpiredFiles;
+      console.log("Pólizas por notificar encontrados:", filteredExpiredpolizas.length);
+      if (filteredExpiredpolizas.length === 0) return [];
+      return filteredExpiredpolizas;
   
     } catch (error) {
       console.error(error);
@@ -76,7 +76,7 @@ export const sendEmail = action({
   ,
 );
 
-export const markFilesAsNotified = internalMutation({
+export const markpolizasAsNotified = internalMutation({
   args: { ids: v.array(v.any()) },
 
   async handler(ctx, args) {

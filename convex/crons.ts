@@ -7,27 +7,27 @@ const crons = cronJobs();
 crons.interval(
   "delete any old files marked for deletion",
   { minutes: 25 },
-  internal.files.deleteAllFiles
+  internal.polizas.deleteAllpolizas
 );
 
 crons.interval(
   "notify users of expired files",
   { minutes: 1},  // Se ejecuta cada hora para reducir la carga
-  internal.files.notifyExpiredFiles
+  internal.polizas.notifyExpiredpolizas
   
 );
 
 crons.interval(
   "Update files to expired",
   { minutes: 1 },
-  internal.files.updateExpiredFiles
+  internal.polizas.updateExpiredpolizas
 );
 
 
 crons.interval(
   "Update files to near expired",
   { minutes: 1 },
-  internal.files.updateNearExpiredFiles
+  internal.polizas.updateNearExpiredpolizas
  
 );
 

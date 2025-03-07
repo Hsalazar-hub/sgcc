@@ -14,7 +14,7 @@ import { ReactNode } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import Image from "next/image";
-import { FileCardActions } from "./file-actions";
+import { PolizaCardActions } from "./poliza-actions";
 setDefaultOptions({ locale: es });
 
 const StatusChip = ({ status }: any) => {
@@ -37,40 +37,40 @@ const StatusChip = ({ status }: any) => {
   );
 };
 
-export function FileCard({
-  file,
+export function PolizaCard({
+  poliza,
 }: {
-  file: Doc<"files"> & { isFavorited: boolean; url: string | null };
+  poliza: Doc<"polizas"> & { isFavorited: boolean; url: string | null };
 }) {
-  const userProfile = useQuery(api.users.getUserProfile, {
-    userId: file.userId,
+  const userProfile = useQuery(api.corredores.getUserProfile, {
+    corredorId: poliza.corredorId,
   });
 
   const typeIcons = {
     image: <ImageIcon />,
     pdf: <FileTextIcon />,
     csv: <GanttChartIcon />,
-  } as Record<NonNullable<Doc<"files">["type"]>, ReactNode>;
+  } as Record<NonNullable<Doc<"polizas">["type"]>, ReactNode>;
 
   return (
     <Card>
       <CardHeader className="relative">
         <CardTitle className="flex gap-2 text-base font-normal">
-          <div className="flex justify-center">{typeIcons[file.type]}</div>{" "}
-          <span className="truncate hidden sm:inline">{file.name}</span>
+          <div className="flex justify-center">{typeIcons[poliza.type]}</div>{" "}
+          <span className="truncate hidden sm:inline">{poliza.name}</span>
         </CardTitle>
         <div className="absolute top-2 right-2 hidden sm:flex gap-2">
-          <StatusChip status={file.status} />
-          <FileCardActions isFavorited={file.isFavorited} file={file} />
+          <StatusChip status={poliza.status} />
+          <PolizaCardActions isFavorited={poliza.isFavorited} poliza={poliza} />
         </div>
       </CardHeader>
       <CardContent className="h-[200px] flex justify-center items-center">
-        {file.type === "image" && file.url && (
-          <Image alt={file.name} width="200" height="100" src={file.url} />
+        {poliza.type === "image" && poliza.url && (
+          <Image alt={poliza.name} width="200" height="100" src={poliza.url} />
         )}
 
-        {file.type === "csv" && <GanttChartIcon className="w-20 h-20" />}
-        {file.type === "pdf" && <FileTextIcon className="w-20 h-20" />}
+        {poliza.type === "csv" && <GanttChartIcon className="w-20 h-20" />}
+        {poliza.type === "pdf" && <FileTextIcon className="w-20 h-20" />}
       </CardContent>
       <CardFooter className="flex flex-col gap-2 items-start">
         <div className="hidden sm:flex items-center gap-2 text-xs text-gray-700 w-40">
@@ -81,36 +81,36 @@ export function FileCard({
           <span className="truncate">{userProfile?.name}</span>
         </div>
         <div className="hidden sm:block text-xs text-gray-700 truncate">
-          Tomador: {file.cname}
+          Tomador: {poliza.cname}
         </div>
         <div className="hidden sm:block text-xs text-gray-700 truncate">
-          Correo: {file.email}
+          Correo: {poliza.email}
         </div>
         <div className="hidden sm:block text-xs text-gray-700 truncate">
-          Numero de telefono: {file.cnumber}
+          Numero de telefono: {poliza.cnumber}
         </div>
         <div className="hidden sm:block text-xs text-gray-700 truncate">
-          Monto: {file.monto}$
+          Monto: {poliza.monto}$
         </div>
         {/* <div className="hidden sm:block text-xs text-gray-700 truncate">
-          Subida el {formatRelative(new Date(file._creationTime), new Date())}
+          Subida el {formatRelative(new Date(poliza._creationTime), new Date())}
         </div> */}
           <div className="hidden sm:block text-xs text-gray-700 truncate">
-          Tipo de póliza: {file.ptype}
+          Tipo de póliza: {poliza.ptype}
         </div>
         <div className="hidden sm:block text-xs text-gray-700 truncate">
-          {file.expdate ? (
-            <div>Expira {formatRelative(new Date(file.expdate), new Date())}</div>
+          {poliza.expdate ? (
+            <div>Expira {formatRelative(new Date(poliza.expdate), new Date())}</div>
           ) : (
             <div>Sin fecha de expiración</div>
           )}
         </div>
       
         <div className="flex sm:hidden flex-col gap-2 mt-2 w-full">
-          <span className="truncate text-xs text-gray-700">{file.name}</span>
+          <span className="truncate text-xs text-gray-700">{poliza.name}</span>
           <div className="flex gap-2">
-            <StatusChip status={file.status} />
-            <FileCardActions isFavorited={file.isFavorited} file={file} />
+            <StatusChip status={poliza.status} />
+            <PolizaCardActions isFavorited={poliza.isFavorited} poliza={poliza} />
           </div>
         </div>
       </CardFooter>

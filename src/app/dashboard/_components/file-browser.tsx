@@ -3,7 +3,7 @@ import { useOrganization, useUser } from "@clerk/nextjs";
 import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { UploadButton } from "./upload-button";
-import { FileCard } from "./file-card";
+import { PolizaCard } from "./poliza-card";
 import Image from "next/image";
 import { GridIcon, Loader2, RowsIcon } from "lucide-react";
 import { SearchBar } from "./search-bar";
@@ -48,8 +48,8 @@ export function FileBrowser({
   const organization = useOrganization();
   const user = useUser();
   const [query, setQuery] = useState("");
-  const [type, setType] = useState<Doc<"files">["type"] | "all">("all");
-  const [ptype, setpType] = useState<Doc<"files">["ptype"] | "all">("all");
+  const [type, setType] = useState<Doc<"polizas">["type"] | "all">("all");
+  const [ptype, setpType] = useState<Doc<"polizas">["ptype"] | "all">("all");
 
   let orgId: string | undefined = undefined;
   if (organization.isLoaded && user.isLoaded) {
@@ -57,12 +57,12 @@ export function FileBrowser({
   }
 
   const favorites = useQuery(
-    api.files.getAllFavorites,
+    api.polizas.getAllFavorites,
     orgId ? { orgId } : "skip"
   );
 
-  const files = useQuery(
-    api.files.getFiles,
+  const polizas = useQuery(
+    api.polizas.getpolizas,
     orgId
       ? {
           orgId,
@@ -74,13 +74,13 @@ export function FileBrowser({
         }
       : "skip"
   );
-  const isLoading = files === undefined;
+  const isLoading = polizas === undefined;
 
-  const modifiedFiles =
-    files?.map((file) => ({
-      ...file,
+  const modifiedpolizas =
+    polizas?.map((poliza) => ({
+      ...poliza,
       isFavorited: (favorites ?? []).some(
-        (favorite) => favorite.fileId === file._id
+        (favorite) => favorite.polizaId === poliza._id
       ),
     })) ?? [];
 
@@ -146,17 +146,17 @@ export function FileBrowser({
 
         <TabsContent value="grid">
           <div className="grid grid-cols-3 gap-4">
-            {modifiedFiles?.map((file) => {
-              return <FileCard key={file._id} file={file} />;
+            {modifiedpolizas?.map((poliza) => {
+              return <PolizaCard key={poliza._id} poliza={poliza} />;
             })}
           </div>
         </TabsContent>
         <TabsContent value="table">
-          <DataTable columns={columns} data={modifiedFiles} />
+          <DataTable columns={columns} data={modifiedpolizas} />
         </TabsContent>
       </Tabs>
 
-      {files?.length === 0 && <Placeholder />}
+      {polizas?.length === 0 && <Placeholder />}
     </div>
   );
 }

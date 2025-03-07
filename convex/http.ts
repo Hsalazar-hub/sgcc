@@ -26,7 +26,7 @@ http.route({
 
       switch (result.type) {
         case "user.created":
-          await ctx.runMutation(internal.users.createUser, {
+          await ctx.runMutation(internal.corredores.createcorredor, {
             tokenIdentifier: `https://${clerk}|${result.data.id}`,
             name: `${result.data.first_name ?? ""} ${
               result.data.last_name ?? ""
@@ -36,7 +36,7 @@ http.route({
           });
           break;
         case "user.updated":
-          await ctx.runMutation(internal.users.updateUser, {
+          await ctx.runMutation(internal.corredores.updatecorredor, {
             tokenIdentifier: `https://${clerk}|${result.data.id}`,
             name: `${result.data.first_name ?? ""} ${
               result.data.last_name ?? ""
@@ -47,7 +47,7 @@ http.route({
         case "organizationMembership.created":
           console.log("result: ", result);
           
-          await ctx.runMutation(internal.users.addOrgIdToUser, {
+          await ctx.runMutation(internal.corredores.addOrgIdTocorredor, {
             tokenIdentifier: `https://${clerk}|${result.data.public_user_data.user_id}`,
             orgId: result.data.organization.id,
             role: result.data.role === "org:admin" ? "admin" : "member",
@@ -57,14 +57,14 @@ http.route({
           
         case "organizationMembership.updated":
        
-          await ctx.runMutation(internal.users.updateRoleInOrgForUser, {
+          await ctx.runMutation(internal.corredores.updateRoleInOrgForcorredor, {
             tokenIdentifier: `https://${clerk}|${result.data.public_user_data.user_id}`,
             orgId: result.data.organization.id,
             role: result.data.role === "org:admin" ? "admin" : "member",
           });
           break;
         case "organizationInvitation.accepted":
-          await ctx.runMutation(internal.users.addOrgIdToUserByEmail, {
+          await ctx.runMutation(internal.corredores.addOrgIdTocorredorByEmail, {
             email: result.data.email_address,
             orgId: result.data.organization_id,
             role: result.data.role === "org:admin" ? "admin" : "member",

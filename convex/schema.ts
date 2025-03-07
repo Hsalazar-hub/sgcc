@@ -31,13 +31,13 @@ export const ptypes = v.optional(v.union(
 export const roles = v.union(v.literal("admin"), v.literal("member"));
 
 export default defineSchema({
-  files: defineTable({
+  polizas: defineTable({
     name: v.string(),
     type: fileTypes,
     monto: v.optional(v.float64()),
     orgId: v.string(),
-    fileId: v.id("_storage"),
-    userId: v.id("users"),
+    polizaId: v.id("_storage"),
+    corredorId: v.id("corredores"),
     notified: v.optional(v.boolean()),
     cname: v.optional(v.string()),
     cnumber: v.optional(v.string()),
@@ -51,11 +51,11 @@ export default defineSchema({
     .index("by_expdate", ["expdate"])
     .index("by_shouldDelete", ["shouldDelete"]),
   favorites: defineTable({
-    fileId: v.id("files"),
+    polizaId: v.id("polizas"),
     orgId: v.string(),
-    userId: v.id("users"),
-  }).index("by_userId_orgId_fileId", ["userId", "orgId", "fileId"]),
-  users: defineTable({
+    corredorId: v.id("corredores"),
+  }).index("by_corredorId_orgId_polizaId", ["corredorId", "orgId", "polizaId"]),
+  corredores: defineTable({
     tokenIdentifier: v.string(),
     name: v.optional(v.string()),
     image: v.optional(v.string()),

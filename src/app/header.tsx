@@ -23,13 +23,13 @@ export function Header() {
     <div className="relative z-10 border-b py-4 bg-gray-50">
       <div className="container mx-auto flex flex-wrap items-center justify-between">
         <Link href="/" className="flex gap-2 items-center text-xl text-black">
-          <Image src="/logo.png" width="50" height="50" alt="file drive logo" />
+          <Image src="/logo.png" width="50" height="50" alt="poliza drive logo" />
           SGCS
         </Link>
  <div className="flex flex-wrap items-center gap-2">
           <SignedIn>
             <Button variant={"outline"}>
-              <Link href="/dashboard/files">Tus Pólizas</Link>
+              <Link href="/dashboard/polizas">Tus Pólizas</Link>
             </Button>
           </SignedIn>
 

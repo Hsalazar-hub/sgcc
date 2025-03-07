@@ -30,18 +30,18 @@ import { api } from "../../../../convex/_generated/api";
 import { useToast } from "@/components/ui/use-toast";
 import { Protect } from "@clerk/nextjs";
 
-export function FileCardActions({
-  file,
+export function PolizaCardActions({
+  poliza,
   isFavorited,
 }: {
-  file: Doc<"files"> & { url: string | null };
+  poliza: Doc<"polizas"> & { url: string | null };
   isFavorited: boolean;
 }) {
-  const deleteFile = useMutation(api.files.deleteFile);
-  const restoreFile = useMutation(api.files.restoreFile);
-  const toggleFavorite = useMutation(api.files.toggleFavorite);
+  const deletepoliza = useMutation(api.polizas.deletepoliza);
+  const restorepoliza = useMutation(api.polizas.restorepoliza);
+  const toggleFavorite = useMutation(api.polizas.toggleFavorite);
   const { toast } = useToast();
-  const me = useQuery(api.users.getMe);
+  const me = useQuery(api.corredores.getMe);
 
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
@@ -59,8 +59,8 @@ export function FileCardActions({
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
               onClick={async () => {
-                await deleteFile({
-                  fileId: file._id,
+                await deletepoliza({
+                  polizaId: poliza._id,
                 });
                 toast({
                   variant: "default",
@@ -69,7 +69,7 @@ export function FileCardActions({
                 });
               }}
             >
-              Continuar
+              Continue
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -82,8 +82,8 @@ export function FileCardActions({
         <DropdownMenuContent>
           <DropdownMenuItem
             onClick={() => {
-              if (!file.url) return;
-              window.open(file.url, "_blank");
+              if (!poliza.url) return;
+              window.open(poliza.url, "_blank");
             }}
             className="flex gap-1 items-center cursor-pointer"
           >
@@ -93,7 +93,7 @@ export function FileCardActions({
           <DropdownMenuItem
             onClick={() => {
               toggleFavorite({
-                fileId: file._id,
+                polizaId: poliza._id,
               });
             }}
             className="flex gap-1 items-center cursor-pointer"
@@ -114,7 +114,7 @@ export function FileCardActions({
               return (
                 check({
                   role: "org:admin",
-                }) || file.userId === me?._id
+                }) || poliza.corredorId === me?._id
               );
             }}
             fallback={<></>}
@@ -122,9 +122,9 @@ export function FileCardActions({
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={() => {
-                if (file.shouldDelete) {
-                  restoreFile({
-                    fileId: file._id,
+                if (poliza.shouldDelete) {
+                  restorepoliza({
+                    polizaId: poliza._id,
                   });
                 } else {
                   setIsConfirmOpen(true);
@@ -132,7 +132,7 @@ export function FileCardActions({
               }}
               className="flex gap-1 items-center cursor-pointer"
             >
-              {file.shouldDelete ? (
+              {poliza.shouldDelete ? (
                 <div className="flex gap-1 text-green-600 items-center cursor-pointer">
                   <UndoIcon className="w-4 h-4" /> <span className="hidden sm:inline">Restaurar</span>
                 </div>

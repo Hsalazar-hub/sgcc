@@ -41,9 +41,9 @@ import { Doc } from "../../../../convex/_generated/dataModel";
 
 const formSchema = z.object({
   title: z.string().min(1).max(200),
-  file: z
+  poliza: z
     .custom<FileList>((val) => val instanceof FileList, "Required")
-    .refine((files) => files.length > 0, `Required`),
+    .refine((polizas) => polizas.length > 0, `Required`),
   monto: z.number(),
   expdate: z.date(),
   ptype: z.string(),
@@ -55,14 +55,14 @@ const formSchema = z.object({
 export function UploadButton() {
   const { toast } = useToast();
   const organization = useOrganization();
-  const user = useUser();
-  const generateUploadUrl = useMutation(api.files.generateUploadUrl);
+  const corredor = useUser();
+  const generateUploadUrl = useMutation(api.polizas.generateUploadUrl);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
-      file: undefined,
+      poliza: undefined,
       monto: 0,
       cname: "",
       email: "",
@@ -72,7 +72,7 @@ export function UploadButton() {
     },
   });
 
-  const fileRef = form.register("file");
+  const polizaRef = form.register("poliza");
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (!orgId) return;
@@ -80,14 +80,14 @@ export function UploadButton() {
     const data: any = values;
     const postUrl = await generateUploadUrl();
 
-    const fileType = values.file[0].type;
+    const fileType = values.poliza[0].type;
 
     data.expdate = new Date(data.expdate).getTime();
 
     const result = await fetch(postUrl, {
       method: "POST",
       headers: { "Content-Type": fileType },
-      body: data.file[0],
+      body: data.poliza[0],
     });
     const { storageId } = await result.json();
 
@@ -96,12 +96,12 @@ export function UploadButton() {
       "image/jpeg": "image",
       "application/pdf": "pdf",
       "text/csv": "csv",
-    } as Record<string, Doc<"files">["type"]>;
+    } as Record<string, Doc<"polizas">["type"]>;
 
     try {
-      const newfile = {
+      const newpoliza = {
         name: data.title,
-        fileId: storageId,
+        polizaId: storageId,
         expdate: data.expdate,
         orgId,
         cname: data.cname,
@@ -115,13 +115,13 @@ export function UploadButton() {
       console.log("fileType: ", fileType);
       console.log("types: ", types);
       console.log("data: ", data);
-      console.log("data: ", newfile);
+      console.log("data: ", newpoliza);
 
-      await createFile(newfile);
+      await createpoliza(newpoliza);
 
       form.reset();
 
-      setIsFileDialogOpen(false);
+      setIspolizaDialogOpen(false);
 
       toast({
         variant: "success",
@@ -140,25 +140,25 @@ export function UploadButton() {
   }
 
   let orgId: string | undefined = undefined;
-  let userRole: string | undefined = undefined;
+  let corredorRole: string | undefined = undefined;
 
-  if (organization.isLoaded && user.isLoaded) {
-    orgId = organization.organization?.id ?? user.user?.id;
-    userRole = organization.membership?.role;
+  if (organization.isLoaded && corredor.isLoaded) {
+    orgId = organization.organization?.id ?? corredor.user?.id;
+    corredorRole = organization.membership?.role;
   }
-console.log('userRole: ', userRole);
-  const [isFileDialogOpen, setIsFileDialogOpen] = useState(false);
+console.log('corredorRole: ', corredorRole);
+  const [ispolizaDialogOpen, setIspolizaDialogOpen] = useState(false);
 
-  const createFile = useMutation(api.files.createFile);
+  const createpoliza = useMutation(api.polizas.createpoliza);
 
-  if (userRole === "org:member") {
+  if (corredorRole === "org:member") {
     return null; // Hide the component if the user is a member
   }
   return (
     <Dialog
-      open={isFileDialogOpen}
+      open={ispolizaDialogOpen}
       onOpenChange={(isOpen) => {
-        setIsFileDialogOpen(isOpen);
+        setIspolizaDialogOpen(isOpen);
         form.reset();
       }}
     >
@@ -316,12 +316,12 @@ console.log('userRole: ', userRole);
               />
               <FormField
                 control={form.control}
-                name="file"
+                name="poliza"
                 render={() => (
                   <FormItem>
                     <FormLabel>Archivo</FormLabel>
                     <FormControl>
-                      <Input type="file" {...fileRef} />
+                      <Input type="poliza" {...polizaRef} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
